@@ -1,22 +1,24 @@
 "use client";
 
 import { Clock, MapPin, Phone } from "lucide-react";
-import { SITE } from "@/lib/constants";
 import { useI18n } from "@/lib/i18n/language-provider";
+import { toTelHref } from "@/lib/site";
+import { useSite } from "@/lib/site-provider";
 
 export function InfoBar() {
   const { t } = useI18n();
+  const { settings } = useSite();
   const items = [
     {
       icon: Phone,
       label: t.info.questions,
-      value: SITE.phoneDisplay,
-      href: `tel:${SITE.phoneTel}`,
+      value: settings.phone_display,
+      href: toTelHref(settings.phone_display || settings.whatsapp),
     },
     {
       icon: MapPin,
       label: t.info.located,
-      value: SITE.address,
+      value: settings.address,
       href: "#nosotras",
     },
     {

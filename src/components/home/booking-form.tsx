@@ -6,10 +6,12 @@ import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { submitInquiry } from "@/app/actions";
 import { useI18n } from "@/lib/i18n/language-provider";
+import { useSite } from "@/lib/site-provider";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 export function BookingForm() {
   const { t, locale } = useI18n();
+  const { settings } = useSite();
   const [pending, setPending] = useState(false);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -44,6 +46,7 @@ export function BookingForm() {
           payload.event_date,
           payload.message,
         ),
+        settings.whatsapp,
       ),
       "_blank",
       "noopener,noreferrer",

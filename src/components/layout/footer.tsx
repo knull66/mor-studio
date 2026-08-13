@@ -2,6 +2,8 @@
 
 import { NAV_HREFS, SITE } from "@/lib/constants";
 import { useI18n } from "@/lib/i18n/language-provider";
+import { instagramHandle, socialHref } from "@/lib/site";
+import { useSite } from "@/lib/site-provider";
 
 function InstagramIcon() {
   return (
@@ -19,8 +21,20 @@ function FacebookIcon() {
   );
 }
 
+function TikTokIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-4 fill-current" aria-hidden="true">
+      <path d="M14.5 3c.4 2.6 2.1 4.4 4.6 4.7v3.1c-1.6 0-3-.5-4.3-1.3v6.8c0 3.4-2.7 6.2-6.2 6.2S2.4 19.7 2.4 16.2 5.1 10 8.6 10c.4 0 .8 0 1.2.1v3.2c-.4-.2-.8-.3-1.2-.3-1.7 0-3.1 1.4-3.1 3.2s1.4 3.2 3.1 3.2 3.1-1.4 3.1-3.2V3h2.8Z" />
+    </svg>
+  );
+}
+
 export function Footer() {
   const { t } = useI18n();
+  const { settings } = useSite();
+  const instagram = socialHref("instagram", settings.instagram);
+  const facebook = socialHref("facebook", settings.facebook);
+  const tiktok = socialHref("tiktok", settings.tiktok);
   const links = [
     [t.footer.links.home, NAV_HREFS.home],
     [t.footer.links.about, NAV_HREFS.about],
@@ -42,12 +56,21 @@ export function Footer() {
             {t.footer.blurb}
           </p>
           <div className="mt-6 flex items-center justify-center gap-4 md:justify-start">
-            <a href={SITE.instagram} aria-label="Instagram" className="text-ink/70 hover:text-ink">
-              <InstagramIcon />
-            </a>
-            <a href={SITE.facebook} aria-label="Facebook" className="text-ink/70 hover:text-ink">
-              <FacebookIcon />
-            </a>
+            {instagram ? (
+              <a href={instagram} aria-label="Instagram" className="text-ink/70 hover:text-ink">
+                <InstagramIcon />
+              </a>
+            ) : null}
+            {facebook ? (
+              <a href={facebook} aria-label="Facebook" className="text-ink/70 hover:text-ink">
+                <FacebookIcon />
+              </a>
+            ) : null}
+            {tiktok ? (
+              <a href={tiktok} aria-label="TikTok" className="text-ink/70 hover:text-ink">
+                <TikTokIcon />
+              </a>
+            ) : null}
           </div>
         </div>
 
@@ -75,14 +98,15 @@ export function Footer() {
               {t.footer.book}
             </a>
           </form>
-          <p className="mt-4 text-sm text-muted">{SITE.address}</p>
-          <p className="text-sm text-muted">{SITE.phoneDisplay}</p>
+          <p className="mt-4 text-sm text-muted">{settings.address}</p>
+          <p className="text-sm text-muted">{settings.phone_display}</p>
           <p className="text-sm text-muted">{t.info.hours}</p>
         </div>
       </div>
       <div className="border-t border-sand-deep px-6 py-5 text-center text-[0.7rem] tracking-wide text-muted">
-        © {new Date().getFullYear()} MOR Studio. {t.footer.rights}{" "}
-        <a href="/admin/login" className="ml-2 underline decoration-transparent hover:decoration-taupe">
+        © {new Date().getFullYear()} MOR Studio. {t.footer.rights}
+        <span className="mx-2">·</span>
+        <a href="/admin/login" className="underline decoration-taupe/60 underline-offset-4 hover:text-ink">
           {t.footer.admin}
         </a>
       </div>

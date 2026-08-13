@@ -6,12 +6,14 @@ import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { PACKAGE_TAB_IDS } from "@/lib/constants";
 import { useI18n } from "@/lib/i18n/language-provider";
+import { useSite } from "@/lib/site-provider";
 import type { PackageCategory, ServicePackage } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 export function PackagesSection({ packages }: { packages: ServicePackage[] }) {
   const { t, locale } = useI18n();
+  const { settings } = useSite();
   const [tab, setTab] = useState<PackageCategory>("bridal_combo");
   const visible = useMemo(
     () => packages.filter((item) => item.category === tab && item.is_active),
@@ -84,7 +86,7 @@ export function PackagesSection({ packages }: { packages: ServicePackage[] }) {
                   ))}
                 </ul>
                 <a
-                  href={whatsappUrl(t.whatsapp.package(title, priceLabel))}
+                  href={whatsappUrl(t.whatsapp.package(title, priceLabel), settings.whatsapp)}
                   target="_blank"
                   rel="noreferrer"
                   className="solid-btn mt-8 w-full"

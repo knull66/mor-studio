@@ -11,7 +11,7 @@ export const SITE = {
   city: "San Antonio",
   region: "TX",
   country: "US",
-  instagram: "https://instagram.com/morstudio",
+  instagram: "https://www.instagram.com/Moor_Beauty_photography/",
   facebook: "https://facebook.com/morstudio",
   tiktok: "https://tiktok.com/@morstudio",
   artistPhotos: [

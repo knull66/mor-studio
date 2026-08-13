@@ -244,3 +244,143 @@ export async function updateInquiryStatus(id: string, status: "pending" | "atten
     return { ok: false, error: error instanceof Error ? error.message : "Error al actualizar." };
   }
 }
+
+export async function updateSiteSettings(formData: FormData): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const payload = {
+      id: "main",
+      instagram: String(formData.get("instagram") ?? "").trim(),
+      facebook: String(formData.get("facebook") ?? "").trim(),
+      tiktok: String(formData.get("tiktok") ?? "").trim(),
+      whatsapp: String(formData.get("whatsapp") ?? "").trim(),
+      phone_display: String(formData.get("phone_display") ?? "").trim(),
+      email: String(formData.get("email") ?? "").trim(),
+      address: String(formData.get("address") ?? "").trim(),
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from("site_settings").upsert(payload, { onConflict: "id" });
+    if (error) {
+      return {
+        ok: false,
+        error:
+          error.message.includes("schema cache") || error.code === "PGRST205"
+            ? "Falta crear las tablas. Ejecuta supabase/migration-site.sql en el SQL Editor de Supabase."
+            : error.message,
+      };
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al guardar." };
+  }
+}
+
+export async function createHeroSlide(formData: FormData): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const file = formData.get("file");
+    const alt = String(formData.get("alt") ?? "").trim();
+    const caption = String(formData.get("caption") ?? "").trim();
+
+    if (!(file instanceof File) || file.size === 0) {
+      return { ok: false, error: "Selecciona una imagen para el slider." };
+    }
+
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `hero/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("portfolio")
+      .upload(path, file, { contentType: file.type, upsert: false });
+
+    if (uploadError) return { ok: false, error: uploadError.message };
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("portfolio").getPublicUrl(path);
+
+    const { data: last } = await supabase
+      .from("hero_slides")
+      .select("sort_order")
+      .order("sort_order", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const { error } = await supabase.from("hero_slides").insert({
+      image_url: publicUrl,
+      alt: alt || "MOR Studio",
+      caption,
+      is_published: true,
+      sort_order: (last?.sort_order ?? 0) + 1,
+    });
+
+    if (error) {
+      return {
+        ok: false,
+        error:
+          error.message.includes("schema cache") || error.code === "PGRST205"
+            ? "Falta crear las tablas. Ejecuta supabase/migration-site.sql en el SQL Editor de Supabase."
+            : error.message,
+      };
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al subir." };
+  }
+}
+
+export async function deleteHeroSlide(id: string, imageUrl: string): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { error } = await supabase.from("hero_slides").delete().eq("id", id);
+    if (error) return { ok: false, error: error.message };
+
+    const marker = "/storage/v1/object/public/portfolio/";
+    const idx = imageUrl.indexOf(marker);
+    if (idx !== -1) {
+      const path = decodeURIComponent(imageUrl.slice(idx + marker.length));
+      await supabase.storage.from("portfolio").remove([path]);
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al eliminar." };
+  }
+}
+
+export async function updateHeroOrder(id: string, direction: "up" | "down"): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { data: items, error } = await supabase
+      .from("hero_slides")
+      .select("id, sort_order")
+      .order("sort_order", { ascending: true });
+
+    if (error || !items) return { ok: false, error: error?.message ?? "Sin datos." };
+
+    const index = items.findIndex((item) => item.id === id);
+    const swapWith = direction === "up" ? index - 1 : index + 1;
+    if (index < 0 || swapWith < 0 || swapWith >= items.length) return { ok: true };
+
+    const current = items[index];
+    const neighbor = items[swapWith];
+    await Promise.all([
+      supabase.from("hero_slides").update({ sort_order: neighbor.sort_order }).eq("id", current.id),
+      supabase.from("hero_slides").update({ sort_order: current.sort_order }).eq("id", neighbor.id),
+    ]);
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al reordenar." };
+  }
+}

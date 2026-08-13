@@ -311,7 +311,7 @@ const es = {
     hoursLabel: "Horario",
     hours: "Mar — Sáb · 10:00 a.m. – 7:00 p.m.",
   },
-  instagram: "@morstudio · Síguenos",
+  instagram: "Síguenos",
   footer: {
     blurb:
       "Estudio de fotografía y maquillaje en San Antonio, Texas, dirigido por Elisabeth Morao. Belleza que se siente natural y se ve de revista.",
@@ -662,7 +662,7 @@ const en: typeof es = {
     hoursLabel: "Hours",
     hours: "Tue — Sat · 10:00 AM – 7:00 PM",
   },
-  instagram: "@morstudio · Follow us",
+  instagram: "Follow us",
   footer: {
     blurb:
       "Photography and makeup studio in San Antonio, Texas, led by Elisabeth Morao. Beauty that feels natural and looks like an editorial.",

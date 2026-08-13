@@ -18,15 +18,16 @@ export default function LoginPage() {
         </p>
         {!configured ? (
           <p className="mt-8 text-sm leading-relaxed text-muted">
-            El panel usa Supabase Auth. Copia <code className="text-ink">.env.example</code> a
-            <code className="text-ink"> .env.local</code>, pega tu URL y anon key, ejecuta{" "}
-            <code className="text-ink">supabase/schema.sql</code> en el SQL Editor y crea un
-            usuario en Authentication.
+            Falta configurar Supabase en <code className="text-ink">.env.local</code>. Reinicia
+            el servidor y vuelve a intentar.
           </p>
-        ) : (
-          <LoginForm />
-        )}
-        <a href="/" className="mt-8 block text-center text-sm text-muted hover:text-ink">
+        ) : null}
+        <LoginForm />
+        <p className="mt-6 text-center text-xs leading-relaxed text-muted">
+          En este computador: <span className="text-ink">localhost:3000/admin/login</span>.
+          Desde otro lugar, usa la URL pública del sitio + <span className="text-ink">/admin/login</span>.
+        </p>
+        <a href="/" className="mt-6 block text-center text-sm text-muted hover:text-ink">
           ← Volver al sitio
         </a>
       </div>

@@ -5,6 +5,8 @@ import { Toaster } from "sonner";
 import { SITE } from "@/lib/constants";
 import { defaultLocale, isLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getSiteSettings } from "@/lib/data/queries";
+import { socialHref } from "@/lib/site";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -60,6 +62,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const rawLocale = cookieStore.get(LOCALE_COOKIE)?.value;
   const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
   const t = getDictionary(locale);
+  const settings = await getSiteSettings();
+  const sameAs = [
+    socialHref("instagram", settings.instagram),
+    socialHref("facebook", settings.facebook),
+    socialHref("tiktok", settings.tiktok),
+  ].filter(Boolean);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -68,17 +76,17 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     founder: SITE.artist,
     description: t.meta.description,
     url: SITE.url,
-    telephone: SITE.phoneTel,
-    email: SITE.email,
+    telephone: settings.phone_display,
+    email: settings.email,
     address: {
       "@type": "PostalAddress",
       addressLocality: SITE.city,
       addressRegion: SITE.region,
       addressCountry: SITE.country,
-      streetAddress: SITE.address,
+      streetAddress: settings.address,
     },
     openingHours: "Tu-Sa 10:00-19:00",
-    sameAs: [SITE.instagram, SITE.facebook],
+    sameAs,
     priceRange: "$$",
   };
 

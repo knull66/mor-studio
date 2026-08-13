@@ -5,12 +5,13 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { HERO_SLIDES } from "@/lib/data/seed";
 import { useI18n } from "@/lib/i18n/language-provider";
+import { useSite } from "@/lib/site-provider";
 import { cn } from "@/lib/utils";
 
 export function Hero() {
   const { t } = useI18n();
+  const { slides } = useSite();
   const [index, setIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 30 }, [
     Autoplay({ delay: 6500, stopOnInteraction: false }),
@@ -34,11 +35,11 @@ export function Hero() {
     <section id="inicio" className="relative h-[88vh] min-h-[560px] overflow-hidden bg-ink">
       <div className="h-full overflow-hidden" ref={emblaRef}>
         <div className="flex h-full">
-          {HERO_SLIDES.map((slide) => (
-            <div key={slide.src} className="relative min-w-0 flex-[0_0_100%]">
+          {slides.map((slide) => (
+            <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
               <Image
-                src={slide.src}
-                alt={slide.alt}
+                src={slide.image_url}
+                alt={slide.alt || "MOR Studio"}
                 fill
                 priority
                 sizes="100vw"
@@ -71,37 +72,43 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-3">
-        {HERO_SLIDES.map((slide, i) => (
-          <button
-            key={slide.src}
-            type="button"
-            aria-label={`${t.hero.goToSlide} ${i + 1}`}
-            className={cn(
-              "h-1.5 rounded-full transition-all",
-              i === index ? "w-10 bg-cream" : "w-3 bg-cream/40",
-            )}
-            onClick={() => emblaApi?.scrollTo(i)}
-          />
-        ))}
-      </div>
+      {slides.length > 1 ? (
+        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-3">
+          {slides.map((slide, i) => (
+            <button
+              key={slide.id}
+              type="button"
+              aria-label={`${t.hero.goToSlide} ${i + 1}`}
+              className={cn(
+                "h-1.5 rounded-full transition-all",
+                i === index ? "w-10 bg-cream" : "w-3 bg-cream/40",
+              )}
+              onClick={() => emblaApi?.scrollTo(i)}
+            />
+          ))}
+        </div>
+      ) : null}
 
-      <button
-        type="button"
-        aria-label={t.hero.prev}
-        className="absolute top-1/2 left-4 hidden -translate-y-1/2 rounded-full border border-cream/40 p-2 text-cream/80 hover:bg-cream/10 md:block"
-        onClick={() => emblaApi?.scrollPrev()}
-      >
-        <ChevronLeft className="size-5" />
-      </button>
-      <button
-        type="button"
-        aria-label={t.hero.next}
-        className="absolute top-1/2 right-4 hidden -translate-y-1/2 rounded-full border border-cream/40 p-2 text-cream/80 hover:bg-cream/10 md:block"
-        onClick={() => emblaApi?.scrollNext()}
-      >
-        <ChevronRight className="size-5" />
-      </button>
+      {slides.length > 1 ? (
+        <>
+          <button
+            type="button"
+            aria-label={t.hero.prev}
+            className="absolute top-1/2 left-4 hidden -translate-y-1/2 rounded-full border border-cream/40 p-2 text-cream/80 hover:bg-cream/10 md:block"
+            onClick={() => emblaApi?.scrollPrev()}
+          >
+            <ChevronLeft className="size-5" />
+          </button>
+          <button
+            type="button"
+            aria-label={t.hero.next}
+            className="absolute top-1/2 right-4 hidden -translate-y-1/2 rounded-full border border-cream/40 p-2 text-cream/80 hover:bg-cream/10 md:block"
+            onClick={() => emblaApi?.scrollNext()}
+          >
+            <ChevronRight className="size-5" />
+          </button>
+        </>
+      ) : null}
     </section>
   );
 }

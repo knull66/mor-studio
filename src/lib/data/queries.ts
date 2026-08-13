@@ -1,9 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { SEED_PACKAGES, SEED_PORTFOLIO, SEED_TESTIMONIALS } from "@/lib/data/seed";
+import { DEFAULT_HERO_SLIDES, DEFAULT_SETTINGS } from "@/lib/site";
 import type {
+  HeroSlide,
   Inquiry,
   PortfolioItem,
   ServicePackage,
+  SiteSettings,
   Testimonial,
 } from "@/lib/types";
 
@@ -145,5 +148,66 @@ export async function getAdminStats() {
     portfolio: portfolio.length,
     pending: inquiries.filter((item) => item.status === "pending").length,
     attended: inquiries.filter((item) => item.status === "attended").length,
+  };
+}
+
+export async function getSiteSettings(): Promise<SiteSettings> {
+  const supabase = await createClient();
+  if (!supabase) return DEFAULT_SETTINGS;
+
+  const { data, error } = await supabase
+    .from("site_settings")
+    .select("*")
+    .eq("id", "main")
+    .maybeSingle();
+
+  if (error || !data) return DEFAULT_SETTINGS;
+
+  return {
+    instagram: String(data.instagram ?? DEFAULT_SETTINGS.instagram),
+    facebook: String(data.facebook ?? ""),
+    tiktok: String(data.tiktok ?? ""),
+    whatsapp: String(data.whatsapp ?? DEFAULT_SETTINGS.whatsapp),
+    phone_display: String(data.phone_display ?? DEFAULT_SETTINGS.phone_display),
+    email: String(data.email ?? DEFAULT_SETTINGS.email),
+    address: String(data.address ?? DEFAULT_SETTINGS.address),
+  };
+}
+
+export async function getHeroSlides(): Promise<HeroSlide[]> {
+  const supabase = await createClient();
+  if (!supabase) return DEFAULT_HERO_SLIDES;
+
+  const { data, error } = await supabase
+    .from("hero_slides")
+    .select("*")
+    .eq("is_published", true)
+    .order("sort_order", { ascending: true });
+
+  if (error || !data?.length) return DEFAULT_HERO_SLIDES;
+  return data.map(mapHero);
+}
+
+export async function getAllHeroSlides(): Promise<HeroSlide[]> {
+  const supabase = await createClient();
+  if (!supabase) return DEFAULT_HERO_SLIDES;
+
+  const { data, error } = await supabase
+    .from("hero_slides")
+    .select("*")
+    .order("sort_order", { ascending: true });
+
+  if (error) return [];
+  return (data ?? []).map(mapHero);
+}
+
+function mapHero(row: Record<string, unknown>): HeroSlide {
+  return {
+    id: String(row.id),
+    image_url: String(row.image_url),
+    alt: String(row.alt ?? ""),
+    caption: String(row.caption ?? ""),
+    sort_order: Number(row.sort_order ?? 0),
+    is_published: row.is_published !== false,
   };
 }

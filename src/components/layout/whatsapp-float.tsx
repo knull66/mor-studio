@@ -1,14 +1,16 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n/language-provider";
+import { useSite } from "@/lib/site-provider";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 export function WhatsAppFloat() {
   const { t } = useI18n();
+  const { settings } = useSite();
 
   return (
     <a
-      href={whatsappUrl(t.whatsapp.default)}
+      href={whatsappUrl(t.whatsapp.default, settings.whatsapp)}
       target="_blank"
       rel="noreferrer"
       aria-label={t.whatsapp.label}

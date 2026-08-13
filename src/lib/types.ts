@@ -66,3 +66,22 @@ export type ActionResult = {
   ok: boolean;
   error?: string;
 };
+
+export type SiteSettings = {
+  instagram: string;
+  facebook: string;
+  tiktok: string;
+  whatsapp: string;
+  phone_display: string;
+  email: string;
+  address: string;
+};
+
+export type HeroSlide = {
+  id: string;
+  image_url: string;
+  alt: string;
+  caption: string;
+  sort_order: number;
+  is_published: boolean;
+};
