@@ -1,6 +1,6 @@
 import { SITE } from "@/lib/constants";
-import type { BeforeAfterPair, HeroSlide, SiteSettings } from "@/lib/types";
-import { BEFORE_AFTER, HERO_SLIDES } from "@/lib/data/seed";
+import type { BeforeAfterPair, HeroSlide, InstagramStripItem, SiteSettings } from "@/lib/types";
+import { BEFORE_AFTER, HERO_SLIDES, INSTAGRAM_STRIP } from "@/lib/data/seed";
 
 export const DEFAULT_SETTINGS: SiteSettings = {
   instagram: SITE.instagram,
@@ -33,6 +33,14 @@ export const DEFAULT_BEFORE_AFTER: BeforeAfterPair[] = [
     is_published: true,
   },
 ];
+
+export const DEFAULT_INSTAGRAM_STRIP: InstagramStripItem[] = INSTAGRAM_STRIP.map((src, index) => ({
+  id: `seed-ig-${index}`,
+  image_url: src,
+  alt: "",
+  sort_order: index + 1,
+  is_published: true,
+}));
 
 export function digitsOnly(value: string) {
   return value.replace(/\D/g, "");

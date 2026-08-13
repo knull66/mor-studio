@@ -1,18 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { INSTAGRAM_STRIP } from "@/lib/data/seed";
 import { useI18n } from "@/lib/i18n/language-provider";
 import { instagramHandle, socialHref } from "@/lib/site";
 import { useSite } from "@/lib/site-provider";
+import type { InstagramStripItem } from "@/lib/types";
 
-export function InstagramStrip() {
+export function InstagramStrip({ items }: { items: InstagramStripItem[] }) {
   const { t } = useI18n();
   const { settings } = useSite();
   const href = socialHref("instagram", settings.instagram);
   const handle = instagramHandle(settings.instagram);
 
-  if (!href) return null;
+  if (!href || !items.length) return null;
 
   return (
     <section className="bg-cream">
@@ -25,17 +25,17 @@ export function InstagramStrip() {
         {handle ? `${handle} · ${t.instagram}` : t.instagram}
       </a>
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8">
-        {INSTAGRAM_STRIP.map((src, index) => (
+        {items.map((item, index) => (
           <a
-            key={src}
+            key={item.id}
             href={href}
             target="_blank"
             rel="noreferrer"
             className="relative aspect-square overflow-hidden"
           >
             <Image
-              src={src}
-              alt={`${handle || "Instagram"} ${index + 1}`}
+              src={item.image_url}
+              alt={item.alt || `${handle || "Instagram"} ${index + 1}`}
               fill
               sizes="12.5vw"
               className="object-cover transition duration-500 hover:scale-105"

@@ -96,3 +96,11 @@ export type BeforeAfterPair = {
   sort_order: number;
   is_published: boolean;
 };
+
+export type InstagramStripItem = {
+  id: string;
+  image_url: string;
+  alt: string;
+  sort_order: number;
+  is_published: boolean;
+};

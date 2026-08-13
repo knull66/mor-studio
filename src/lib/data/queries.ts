@@ -1,10 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { SEED_PACKAGES, SEED_PORTFOLIO, SEED_TESTIMONIALS } from "@/lib/data/seed";
-import { DEFAULT_BEFORE_AFTER, DEFAULT_HERO_SLIDES, DEFAULT_SETTINGS } from "@/lib/site";
+import { DEFAULT_BEFORE_AFTER, DEFAULT_HERO_SLIDES, DEFAULT_INSTAGRAM_STRIP, DEFAULT_SETTINGS } from "@/lib/site";
 import type {
   BeforeAfterPair,
   HeroSlide,
   Inquiry,
+  InstagramStripItem,
   PortfolioItem,
   ServicePackage,
   SiteSettings,
@@ -251,4 +252,41 @@ export async function getAllBeforeAfterPairs(): Promise<BeforeAfterPair[]> {
 
   if (error) return [];
   return (data ?? []).map(mapBeforeAfter);
+}
+
+function mapInstagramStrip(row: Record<string, unknown>): InstagramStripItem {
+  return {
+    id: String(row.id),
+    image_url: String(row.image_url),
+    alt: String(row.alt ?? ""),
+    sort_order: Number(row.sort_order ?? 0),
+    is_published: row.is_published !== false,
+  };
+}
+
+export async function getInstagramStrip(): Promise<InstagramStripItem[]> {
+  const supabase = await createClient();
+  if (!supabase) return DEFAULT_INSTAGRAM_STRIP;
+
+  const { data, error } = await supabase
+    .from("instagram_strip")
+    .select("*")
+    .eq("is_published", true)
+    .order("sort_order", { ascending: true });
+
+  if (error || !data?.length) return DEFAULT_INSTAGRAM_STRIP;
+  return data.map(mapInstagramStrip);
+}
+
+export async function getAllInstagramStrip(): Promise<InstagramStripItem[]> {
+  const supabase = await createClient();
+  if (!supabase) return DEFAULT_INSTAGRAM_STRIP;
+
+  const { data, error } = await supabase
+    .from("instagram_strip")
+    .select("*")
+    .order("sort_order", { ascending: true });
+
+  if (error) return [];
+  return (data ?? []).map(mapInstagramStrip);
 }

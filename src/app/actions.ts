@@ -495,3 +495,99 @@ export async function updateBeforeAfterOrder(
     return { ok: false, error: error instanceof Error ? error.message : "Error al reordenar." };
   }
 }
+
+export async function createInstagramStripItem(formData: FormData): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const file = formData.get("file");
+    const alt = String(formData.get("alt") ?? "").trim();
+
+    if (!(file instanceof File) || file.size === 0) {
+      return { ok: false, error: "Selecciona una foto para la tira de Instagram." };
+    }
+
+    const publicUrl = await uploadPortfolioFile(supabase, "instagram-strip", file);
+
+    const { data: last } = await supabase
+      .from("instagram_strip")
+      .select("sort_order")
+      .order("sort_order", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const { error } = await supabase.from("instagram_strip").insert({
+      image_url: publicUrl,
+      alt,
+      is_published: true,
+      sort_order: (last?.sort_order ?? 0) + 1,
+    });
+
+    if (error) {
+      return {
+        ok: false,
+        error: missingTableMessage(error, "supabase/migration-instagram-strip.sql"),
+      };
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al subir." };
+  }
+}
+
+export async function deleteInstagramStripItem(id: string, imageUrl: string): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { error } = await supabase.from("instagram_strip").delete().eq("id", id);
+    if (error) return { ok: false, error: error.message };
+
+    const path = portfolioPathFromUrl(imageUrl);
+    if (path) await supabase.storage.from("portfolio").remove([path]);
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al eliminar." };
+  }
+}
+
+export async function updateInstagramStripOrder(
+  id: string,
+  direction: "up" | "down",
+): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { data: items, error } = await supabase
+      .from("instagram_strip")
+      .select("id, sort_order")
+      .order("sort_order", { ascending: true });
+
+    if (error || !items) return { ok: false, error: error?.message ?? "Sin datos." };
+
+    const index = items.findIndex((item) => item.id === id);
+    const swapWith = direction === "up" ? index - 1 : index + 1;
+    if (index < 0 || swapWith < 0 || swapWith >= items.length) return { ok: true };
+
+    const current = items[index];
+    const neighbor = items[swapWith];
+    await Promise.all([
+      supabase
+        .from("instagram_strip")
+        .update({ sort_order: neighbor.sort_order })
+        .eq("id", current.id),
+      supabase
+        .from("instagram_strip")
+        .update({ sort_order: current.sort_order })
+        .eq("id", neighbor.id),
+    ]);
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al reordenar." };
+  }
+}

@@ -8,28 +8,34 @@ import { toast } from "sonner";
 import {
   createBeforeAfterPair,
   createHeroSlide,
+  createInstagramStripItem,
   deleteBeforeAfterPair,
   deleteHeroSlide,
+  deleteInstagramStripItem,
   updateBeforeAfterOrder,
   updateHeroOrder,
+  updateInstagramStripOrder,
   updateSiteSettings,
 } from "@/app/actions";
-import type { BeforeAfterPair, HeroSlide, SiteSettings } from "@/lib/types";
+import type { BeforeAfterPair, HeroSlide, InstagramStripItem, SiteSettings } from "@/lib/types";
 
 export function SiteManager({
   settings,
   slides,
   beforeAfter,
+  instagramStrip,
 }: {
   settings: SiteSettings;
   slides: HeroSlide[];
   beforeAfter: BeforeAfterPair[];
+  instagramStrip: InstagramStripItem[];
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingPair, setUploadingPair] = useState(false);
+  const [uploadingStrip, setUploadingStrip] = useState(false);
   const [dragging, setDragging] = useState(false);
 
   async function onSaveSettings(event: React.FormEvent<HTMLFormElement>) {
@@ -356,6 +362,97 @@ export function SiteManager({
                   </div>
                 ) : (
                   <p className="text-[0.65rem] uppercase tracking-widest text-muted">Demo</p>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="font-serif text-2xl">Tira de Instagram</h2>
+        <p className="mt-1 mb-6 text-sm text-muted">
+          Fotos cuadradas al final de la página. Cada una abre el perfil de Instagram. Instagram no
+          permite leer el feed automáticamente sin una app de Meta, así que aquí subes las fotos que
+          quieras mostrar (idealmente 8).
+        </p>
+        <form
+          onSubmit={async (event) => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            setUploadingStrip(true);
+            const result = await createInstagramStripItem(new FormData(form));
+            setUploadingStrip(false);
+            if (!result.ok) {
+              toast.error(result.error);
+              return;
+            }
+            toast.success("Foto añadida a la tira.");
+            form.reset();
+            router.refresh();
+          }}
+          className="border border-dashed border-sand-deep bg-cream p-6"
+        >
+          <div className="grid gap-3 md:grid-cols-2">
+            <input required type="file" name="file" accept="image/*" className="text-sm" />
+            <input
+              name="alt"
+              placeholder="Texto alternativo (opcional)"
+              className="border border-sand-deep bg-white px-3 py-2 text-sm outline-none"
+            />
+          </div>
+          <button type="submit" disabled={uploadingStrip} className="solid-btn mt-4">
+            {uploadingStrip ? "Subiendo…" : "Añadir a la tira"}
+          </button>
+        </form>
+
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
+          {instagramStrip.map((item, index) => (
+            <article key={item.id} className="overflow-hidden border border-sand-deep bg-cream">
+              <div className="relative aspect-square">
+                <Image src={item.image_url} alt={item.alt || `Foto ${index + 1}`} fill className="object-cover" />
+              </div>
+              <div className="flex items-center justify-between p-2">
+                {!item.id.startsWith("seed-") ? (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      disabled={index === 0}
+                      className="p-1 disabled:opacity-30"
+                      onClick={async () => {
+                        await updateInstagramStripOrder(item.id, "up");
+                        router.refresh();
+                      }}
+                    >
+                      <ArrowUp className="size-4" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={index === instagramStrip.length - 1}
+                      className="p-1 disabled:opacity-30"
+                      onClick={async () => {
+                        await updateInstagramStripOrder(item.id, "down");
+                        router.refresh();
+                      }}
+                    >
+                      <ArrowDown className="size-4" />
+                    </button>
+                    <button
+                      type="button"
+                      className="p-1 text-red-700"
+                      onClick={async () => {
+                        if (!confirm("¿Quitar esta foto de la tira?")) return;
+                        const result = await deleteInstagramStripItem(item.id, item.image_url);
+                        if (!result.ok) toast.error(result.error);
+                        else toast.success("Eliminada.");
+                        router.refresh();
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-[0.58rem] uppercase tracking-widest text-muted">Demo</p>
                 )}
               </div>
             </article>
