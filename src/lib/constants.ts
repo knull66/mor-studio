@@ -41,12 +41,12 @@ export const NAV_HREFS = {
   book: "#reservar",
 } as const;
 
-export const PACKAGE_TAB_IDS = ["makeup", "photography", "bridal_combo"] as const;
+export const PACKAGE_TAB_IDS = ["makeup", "hair", "photography", "bridal_combo"] as const;
 
 export const PORTFOLIO_FILTER_IDS = [
   "all",
   "brides",
   "makeup",
-  "studio",
-  "exteriors",
+  "photography",
+  "hair",
 ] as const;

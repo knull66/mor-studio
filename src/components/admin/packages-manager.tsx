@@ -60,6 +60,7 @@ export function PackagesManager({ packages }: { packages: ServicePackage[] }) {
             className="border border-sand-deep px-3 py-2 text-sm"
           >
             <option value="makeup">Maquillaje</option>
+            <option value="hair">Peinados</option>
             <option value="photography">Fotografía</option>
             <option value="bridal_combo">Experiencia MOR</option>
           </select>

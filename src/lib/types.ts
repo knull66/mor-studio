@@ -1,10 +1,6 @@
-export type PackageCategory = "makeup" | "photography" | "bridal_combo";
+export type PackageCategory = "makeup" | "hair" | "photography" | "bridal_combo";
 
-export type PortfolioCategory =
-  | "brides"
-  | "makeup"
-  | "studio"
-  | "exteriors";
+export type PortfolioCategory = "brides" | "makeup" | "photography" | "hair";
 
 export type InquiryStatus = "pending" | "attended";
 

@@ -6,7 +6,7 @@ create extension if not exists "pgcrypto";
 create table if not exists public.packages (
   id uuid primary key default gen_random_uuid(),
   title varchar not null,
-  category varchar not null check (category in ('makeup', 'photography', 'bridal_combo')),
+  category varchar not null check (category in ('makeup', 'hair', 'photography', 'bridal_combo')),
   price numeric(10,2) not null,
   description text,
   features text[] default '{}',
@@ -20,7 +20,7 @@ create table if not exists public.packages (
 create table if not exists public.portfolio (
   id uuid primary key default gen_random_uuid(),
   title varchar,
-  category varchar not null check (category in ('brides', 'makeup', 'studio', 'exteriors')),
+  category varchar not null check (category in ('brides', 'makeup', 'photography', 'hair')),
   image_url text not null,
   alt text,
   is_published boolean default true,
@@ -151,6 +151,9 @@ select * from (
     ('Sesión de Estudio', 'photography', 325.00, 'Retrato dirigido en estudio con luz controlada, ideal para beauty, maternidad y personal branding.', ARRAY['20 fotografías editadas','Dirección de pose','2 cambios de outfit','Galería privada digital','Fondo y luz de estudio'], '1.5 horas', true, true, 1),
     ('Sesión Exterior', 'photography', 385.00, 'Luz natural, locaciones con carácter y un ritmo pausado para retratos con alma.', ARRAY['25 fotografías editadas','Locación en San Antonio','Golden hour o luz suave','Asesoría de vestuario'], '2 horas', false, true, 2),
     ('Cobertura de Boda', 'photography', 2200.00, 'Narrativa completa del día: getting ready, ceremonia, retratos y fiesta, con edición cinematográfica.', ARRAY['Cobertura de 8 horas','250+ imágenes editadas','Preview en 7 días','Segunda fotógrafa opcional','Galería de alta resolución'], '8 horas', true, true, 3),
+    ('Peinado de Novia', 'hair', 175.00, 'Recogido o ondas de larga duración, pensado para ceremonias, viento y fotografías de todo el día.', ARRAY['Consulta de estilo y referencias','Prueba previa opcional','Fijación de larga duración','Horquillas y accesorios de novia','Retoque para el after'], '90 minutos', true, true, 1),
+    ('Peinado Social', 'hair', 85.00, 'Recogido, semirecogido u ondas para eventos, quinceañeras y noches que piden un look de revista.', ARRAY['Peinado según el evento','Fijación que aguanta baile y fotos','Acabado alineado al maquillaje','Ideal junto al maquillaje social'], '60 minutos', false, true, 2),
+    ('Prueba de Peinado', 'hair', 70.00, 'La cita para decidir volumen, recogido y accesorios con calma, antes del gran día.', ARRAY['Hasta dos opciones de peinado','Prueba de accesorios y velo','Fotos de referencia','Ajustes para el día del evento'], '60 minutos', false, true, 3),
     ('Experiencia MOR Esencial', 'bridal_combo', 650.00, 'Maquillaje profesional + sesión beauty. El punto de partida para verse y sentirse novia.', ARRAY['Maquillaje de novia o social','Sesión de 1.5 h en estudio','25 fotos editadas','Dirección de pose','Mejor valor para sesiones preboda'], 'Medio día', false, true, 1),
     ('Experiencia MOR Premium', 'bridal_combo', 1100.00, 'Nuestro paquete más pedido: prueba, maquillaje del día y retratos que se sienten de editorial.', ARRAY['Prueba de maquillaje incluida','MUA el día del evento','Sesión preboda 2 h','40 fotos editadas','Kit de retoque','Prioridad de fechas 2026'], 'Día completo de preparación', true, true, 2),
     ('Experiencia MOR Élite', 'bridal_combo', 1800.00, 'Servicio integral para el gran día: belleza, retratos y cobertura con un solo equipo creativo.', ARRAY['Prueba + maquillaje de novia','Cobertura fotográfica 6 h','Getting ready documentado','180 imágenes editadas','Asistente de MUA','Traslado local en San Antonio incluido'], 'Boda + preboda', true, true, 3)

@@ -75,6 +75,7 @@ const es = {
     cta: "Solicitar disponibilidad",
     tabs: {
       makeup: "Maquillaje",
+      hair: "Peinados",
       photography: "Fotografía",
       bridal_combo: "Experiencia MOR",
     },
@@ -208,6 +209,43 @@ const es = {
         "Traslado local en San Antonio incluido",
       ],
     },
+    "hair-novia": {
+      title: "Peinado de Novia",
+      duration: "90 minutos",
+      description:
+        "Recogido o ondas de larga duración, pensado para ceremonias, viento y fotografías de todo el día.",
+      features: [
+        "Consulta de estilo y referencias",
+        "Prueba previa opcional",
+        "Fijación de larga duración",
+        "Horquillas y accesorios de novia",
+        "Retoque para el after",
+      ],
+    },
+    "hair-social": {
+      title: "Peinado Social",
+      duration: "60 minutos",
+      description:
+        "Recogido, semirecogido u ondas para eventos, quinceañeras y noches que piden un look de revista.",
+      features: [
+        "Peinado según el evento",
+        "Fijación que aguanta baile y fotos",
+        "Acabado alineado al maquillaje",
+        "Ideal junto al maquillaje social",
+      ],
+    },
+    "hair-prueba": {
+      title: "Prueba de Peinado",
+      duration: "60 minutos",
+      description:
+        "La cita para decidir volumen, recogido y accesorios con calma, antes del gran día.",
+      features: [
+        "Hasta dos opciones de peinado",
+        "Prueba de accesorios y velo",
+        "Fotos de referencia",
+        "Ajustes para el día del evento",
+      ],
+    },
   } as Record<
     string,
     { title: string; duration: string; description: string; features: string[] }
@@ -218,12 +256,13 @@ const es = {
     description:
       "Una selección de novias, beauty y retrato. Cada imagen se fotografió pensando en piel, gesto y luz — no en tendencias que caducan.",
     close: "Cerrar",
+    expand: "Ver más grande",
     filters: {
       all: "Todos",
       brides: "Novias",
       makeup: "Maquillaje",
-      studio: "Fotografía de Estudio",
-      exteriors: "Exteriores",
+      photography: "Fotografía",
+      hair: "Peinados",
     },
   },
   testimonials: {
@@ -300,7 +339,9 @@ const es = {
       "Maquillaje de novia",
       "Prueba de maquillaje",
       "Maquillaje social",
-      "Sesión fotográfica de estudio",
+      "Peinado de novia",
+      "Peinado social",
+      "Sesión fotográfica",
       "Cobertura de boda",
       "Otro",
     ],
@@ -429,6 +470,7 @@ const en: typeof es = {
     cta: "Request availability",
     tabs: {
       makeup: "Makeup",
+      hair: "Hair",
       photography: "Photography",
       bridal_combo: "MOR Experience",
     },
@@ -562,6 +604,43 @@ const en: typeof es = {
         "Local San Antonio travel included",
       ],
     },
+    "hair-novia": {
+      title: "Bridal Hair",
+      duration: "90 minutes",
+      description:
+        "An updo or long-wear waves, made for ceremonies, wind, and a full day of photographs.",
+      features: [
+        "Style consultation and references",
+        "Optional trial",
+        "Long-hold finish",
+        "Bridal pins and accessories",
+        "Touch-up for the after-party",
+      ],
+    },
+    "hair-social": {
+      title: "Event Hair",
+      duration: "60 minutes",
+      description:
+        "Updo, half-up, or waves for events, quinceañeras, and nights that ask for a magazine finish.",
+      features: [
+        "Style for the occasion",
+        "Hold that lasts through dancing and photos",
+        "Finish aligned with makeup",
+        "Pairs well with social makeup",
+      ],
+    },
+    "hair-prueba": {
+      title: "Hair Trial",
+      duration: "60 minutes",
+      description:
+        "The appointment to decide volume, updo, and accessories with ease, before the big day.",
+      features: [
+        "Up to two hairstyle options",
+        "Accessory and veil trial",
+        "Reference photos",
+        "Adjustments for the event day",
+      ],
+    },
   },
   portfolio: {
     eyebrow: "Gallery",
@@ -569,12 +648,13 @@ const en: typeof es = {
     description:
       "A selection of brides, beauty, and portrait work. Every frame was made for skin, gesture, and light — not passing trends.",
     close: "Close",
+    expand: "View larger",
     filters: {
       all: "All",
       brides: "Brides",
       makeup: "Makeup",
-      studio: "Studio Photography",
-      exteriors: "Outdoors",
+      photography: "Photography",
+      hair: "Hair",
     },
   },
   testimonials: {
@@ -651,7 +731,9 @@ const en: typeof es = {
       "Bridal makeup",
       "Makeup trial",
       "Social makeup",
-      "Studio photo session",
+      "Bridal hair",
+      "Event hair",
+      "Photo session",
       "Wedding coverage",
       "Other",
     ],

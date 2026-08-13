@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { Expand, X } from "lucide-react";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { PORTFOLIO_FILTER_IDS } from "@/lib/constants";
@@ -19,6 +19,20 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
     () => (filter === "all" ? items : items.filter((item) => item.category === filter)),
     [filter, items],
   );
+
+  useEffect(() => {
+    if (!active) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setActive(null);
+    };
+    window.addEventListener("keydown", onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [active]);
 
   return (
     <section id="portafolio" className="bg-cream px-6 py-20 sm:py-28">
@@ -44,25 +58,25 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
           </button>
         ))}
       </div>
-      <div className="mx-auto mt-12 columns-1 gap-4 sm:columns-2 lg:columns-3">
-        {visible.map((item, index) => (
+      <div className="mx-auto mt-10 grid max-w-6xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
+        {visible.map((item) => (
           <button
             key={item.id}
             type="button"
-            className="mb-4 block w-full break-inside-avoid overflow-hidden"
+            className="group relative aspect-square overflow-hidden bg-sand"
             onClick={() => setActive(item)}
+            aria-label={`${item.title}. ${t.portfolio.expand}`}
           >
-            <Reveal delay={(index % 3) * 0.04}>
-              <span className="relative block aspect-[4/5] overflow-hidden">
-                <Image
-                  src={item.image_url}
-                  alt={item.alt || item.title}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition duration-700 hover:scale-105"
-                />
-              </span>
-            </Reveal>
+            <Image
+              src={item.image_url}
+              alt={item.alt || item.title}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover transition duration-500 group-hover:scale-105"
+            />
+            <span className="absolute inset-0 flex items-center justify-center bg-ink/0 transition group-hover:bg-ink/30">
+              <Expand className="size-5 text-cream opacity-80 drop-shadow sm:opacity-0 sm:group-hover:opacity-100" />
+            </span>
           </button>
         ))}
       </div>
@@ -84,16 +98,21 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
             <X className="size-7" />
           </button>
           <div
-            className="relative h-[80vh] w-full max-w-5xl"
+            className="relative flex max-h-[88vh] w-full max-w-4xl flex-col items-center"
             onClick={(event) => event.stopPropagation()}
           >
-            <Image
-              src={active.image_url}
-              alt={active.alt || active.title}
-              fill
-              className="object-contain"
-              sizes="100vw"
-            />
+            <div className="relative h-[72vh] w-full">
+              <Image
+                src={active.image_url}
+                alt={active.alt || active.title}
+                fill
+                className="object-contain"
+                sizes="100vw"
+              />
+            </div>
+            {active.title ? (
+              <p className="mt-4 text-center text-sm tracking-wide text-cream/80">{active.title}</p>
+            ) : null}
           </div>
         </div>
       ) : null}

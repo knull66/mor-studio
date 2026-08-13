@@ -15,8 +15,8 @@ import type { PortfolioItem } from "@/lib/types";
 const CATEGORIES = [
   { id: "brides", label: "Novias" },
   { id: "makeup", label: "Maquillaje" },
-  { id: "studio", label: "Estudio" },
-  { id: "exteriors", label: "Exteriores" },
+  { id: "photography", label: "Fotografía" },
+  { id: "hair", label: "Peinados" },
 ];
 
 export function PortfolioManager({ items }: { items: PortfolioItem[] }) {
@@ -47,7 +47,7 @@ export function PortfolioManager({ items }: { items: PortfolioItem[] }) {
     const data = new FormData(form);
     const file = data.get("file");
     if (!(file instanceof File)) return;
-    await upload(file, String(data.get("title") ?? ""), String(data.get("category") ?? "studio"));
+    await upload(file, String(data.get("title") ?? ""), String(data.get("category") ?? "photography"));
     form.reset();
   }
 

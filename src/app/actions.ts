@@ -167,7 +167,7 @@ export async function createPortfolioItem(formData: FormData): Promise<ActionRes
     const supabase = await requireUser();
     const file = formData.get("file");
     const title = String(formData.get("title") ?? "").trim();
-    const category = String(formData.get("category") ?? "studio");
+    const category = String(formData.get("category") ?? "photography");
 
     if (!(file instanceof File) || file.size === 0) {
       return { ok: false, error: "Selecciona una imagen." };

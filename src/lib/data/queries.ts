@@ -28,11 +28,20 @@ function mapPackage(row: Record<string, unknown>): ServicePackage {
   };
 }
 
+function mapPortfolioCategory(value: unknown): PortfolioItem["category"] {
+  const category = String(value ?? "");
+  if (category === "studio" || category === "exteriors") return "photography";
+  if (category === "brides" || category === "makeup" || category === "photography" || category === "hair") {
+    return category;
+  }
+  return "photography";
+}
+
 function mapPortfolio(row: Record<string, unknown>): PortfolioItem {
   return {
     id: String(row.id),
     title: String(row.title ?? ""),
-    category: row.category as PortfolioItem["category"],
+    category: mapPortfolioCategory(row.category),
     image_url: String(row.image_url),
     alt: row.alt ? String(row.alt) : null,
     sort_order: Number(row.sort_order ?? 0),
