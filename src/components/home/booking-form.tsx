@@ -1,0 +1,130 @@
+"use client";
+
+import { useState } from "react";
+import { toast } from "sonner";
+import { Reveal } from "@/components/ui/reveal";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { submitInquiry } from "@/app/actions";
+import { useI18n } from "@/lib/i18n/language-provider";
+import { whatsappUrl } from "@/lib/whatsapp";
+
+export function BookingForm() {
+  const { t, locale } = useI18n();
+  const [pending, setPending] = useState(false);
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    setPending(true);
+
+    const payload = {
+      client_name: String(data.get("client_name") ?? ""),
+      email: String(data.get("email") ?? ""),
+      phone: String(data.get("phone") ?? ""),
+      event_date: String(data.get("event_date") ?? ""),
+      service_type: String(data.get("service_type") ?? ""),
+      message: String(data.get("message") ?? ""),
+    };
+
+    const result = await submitInquiry(payload);
+    setPending(false);
+
+    if (!result.ok) {
+      toast.error(result.error ?? t.booking.error);
+      return;
+    }
+
+    toast.success(t.booking.success);
+    window.open(
+      whatsappUrl(
+        t.whatsapp.booking(
+          payload.client_name,
+          payload.service_type,
+          payload.event_date,
+          payload.message,
+        ),
+      ),
+      "_blank",
+      "noopener,noreferrer",
+    );
+    form.reset();
+  }
+
+  return (
+    <section id="reservar" className="bg-sand px-6 py-20 sm:py-28">
+      <Reveal>
+        <SectionHeading
+          eyebrow={t.booking.eyebrow}
+          title={t.booking.title}
+          description={t.booking.description}
+        />
+      </Reveal>
+      <Reveal delay={0.08}>
+        <form
+          onSubmit={onSubmit}
+          className="mx-auto mt-12 grid max-w-3xl gap-4 bg-cream p-6 sm:p-10 md:grid-cols-2"
+        >
+          <label className="block text-xs uppercase tracking-[0.16em] text-muted">
+            {t.booking.name}
+            <input
+              required
+              name="client_name"
+              className="mt-2 w-full border border-sand-deep bg-white px-4 py-3 text-sm text-ink outline-none focus:border-taupe"
+            />
+          </label>
+          <label className="block text-xs uppercase tracking-[0.16em] text-muted">
+            {t.booking.phone}
+            <input
+              required
+              name="phone"
+              type="tel"
+              className="mt-2 w-full border border-sand-deep bg-white px-4 py-3 text-sm text-ink outline-none focus:border-taupe"
+            />
+          </label>
+          <label className="block text-xs uppercase tracking-[0.16em] text-muted">
+            {t.booking.email}
+            <input
+              name="email"
+              type="email"
+              className="mt-2 w-full border border-sand-deep bg-white px-4 py-3 text-sm text-ink outline-none focus:border-taupe"
+            />
+          </label>
+          <label className="block text-xs uppercase tracking-[0.16em] text-muted">
+            {t.booking.eventDate}
+            <input
+              name="event_date"
+              type="date"
+              className="mt-2 w-full border border-sand-deep bg-white px-4 py-3 text-sm text-ink outline-none focus:border-taupe"
+            />
+          </label>
+          <label className="block text-xs uppercase tracking-[0.16em] text-muted md:col-span-2">
+            {t.booking.service}
+            <select
+              key={locale}
+              name="service_type"
+              defaultValue={t.booking.services[0]}
+              className="mt-2 w-full border border-sand-deep bg-white px-4 py-3 text-sm text-ink outline-none focus:border-taupe"
+            >
+              {t.booking.services.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-xs uppercase tracking-[0.16em] text-muted md:col-span-2">
+            {t.booking.message}
+            <textarea
+              name="message"
+              rows={4}
+              className="mt-2 w-full border border-sand-deep bg-white px-4 py-3 text-sm text-ink outline-none focus:border-taupe"
+              placeholder={t.booking.placeholder}
+            />
+          </label>
+          <button type="submit" disabled={pending} className="solid-btn md:col-span-2">
+            {pending ? t.booking.sending : t.booking.submit}
+          </button>
+        </form>
+      </Reveal>
+    </section>
+  );
+}

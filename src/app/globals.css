@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-cream: #faf8f5;
+  --color-sand: #f2ece4;
+  --color-sand-deep: #ebe3d8;
+  --color-taupe: #9e8b82;
+  --color-taupe-dark: #7d6b63;
+  --color-ink: #1c1917;
+  --color-charcoal: #1a1a1a;
+  --color-muted: #6f665f;
+  --font-serif: var(--font-cormorant);
+  --font-sans: var(--font-jakarta);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-taupe) 35%, transparent);
+  color: var(--color-ink);
+}
+
+.font-serif {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+}
+
+.nav-link {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  transition: color 0.25s ease;
+}
+
+.nav-link:hover {
+  color: var(--color-taupe-dark);
+}
+
+.outlined-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  padding: 0.85rem 1.6rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.solid-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-charcoal);
+  color: var(--color-cream);
+  padding: 0.85rem 1.6rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.solid-btn:hover {
+  background: var(--color-taupe-dark);
+}
+
+.outlined-btn:hover {
+  background: var(--color-charcoal);
+  color: var(--color-cream);
+  border-color: var(--color-charcoal);
+}
