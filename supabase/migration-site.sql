@@ -60,7 +60,7 @@ insert into public.site_settings (
   '',
   '12105485300',
   '+1 (210) 548-5300',
-  'hello@morstudio.com',
+  'booking@morstudio.vip',
   'San Antonio, Texas'
 )
 on conflict (id) do nothing;

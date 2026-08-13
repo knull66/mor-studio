@@ -18,6 +18,34 @@ async function requireUser() {
   return supabase;
 }
 
+function missingTableMessage(error: { message: string; code?: string }, file: string) {
+  if (error.message.includes("schema cache") || error.code === "PGRST205") {
+    return `Falta crear las tablas. Ejecuta ${file} en el SQL Editor de Supabase.`;
+  }
+  return error.message;
+}
+
+function portfolioPathFromUrl(imageUrl: string) {
+  const marker = "/storage/v1/object/public/portfolio/";
+  const idx = imageUrl.indexOf(marker);
+  if (idx === -1) return null;
+  return decodeURIComponent(imageUrl.slice(idx + marker.length));
+}
+
+async function uploadPortfolioFile(
+  supabase: Awaited<ReturnType<typeof requireUser>>,
+  folder: string,
+  file: File,
+) {
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${folder}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from("portfolio")
+    .upload(path, file, { contentType: file.type, upsert: false });
+  if (error) throw new Error(error.message);
+  return supabase.storage.from("portfolio").getPublicUrl(path).data.publicUrl;
+}
+
 export async function submitInquiry(input: InquiryInput): Promise<ActionResult> {
   const name = input.client_name.trim();
   const phone = input.phone.trim();
@@ -262,13 +290,7 @@ export async function updateSiteSettings(formData: FormData): Promise<ActionResu
 
     const { error } = await supabase.from("site_settings").upsert(payload, { onConflict: "id" });
     if (error) {
-      return {
-        ok: false,
-        error:
-          error.message.includes("schema cache") || error.code === "PGRST205"
-            ? "Falta crear las tablas. Ejecuta supabase/migration-site.sql en el SQL Editor de Supabase."
-            : error.message,
-      };
+      return { ok: false, error: missingTableMessage(error, "supabase/migration-site.sql") };
     }
 
     revalidatePath("/");
@@ -290,17 +312,7 @@ export async function createHeroSlide(formData: FormData): Promise<ActionResult>
       return { ok: false, error: "Selecciona una imagen para el slider." };
     }
 
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `hero/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-    const { error: uploadError } = await supabase.storage
-      .from("portfolio")
-      .upload(path, file, { contentType: file.type, upsert: false });
-
-    if (uploadError) return { ok: false, error: uploadError.message };
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("portfolio").getPublicUrl(path);
+    const publicUrl = await uploadPortfolioFile(supabase, "hero", file);
 
     const { data: last } = await supabase
       .from("hero_slides")
@@ -318,13 +330,7 @@ export async function createHeroSlide(formData: FormData): Promise<ActionResult>
     });
 
     if (error) {
-      return {
-        ok: false,
-        error:
-          error.message.includes("schema cache") || error.code === "PGRST205"
-            ? "Falta crear las tablas. Ejecuta supabase/migration-site.sql en el SQL Editor de Supabase."
-            : error.message,
-      };
+      return { ok: false, error: missingTableMessage(error, "supabase/migration-site.sql") };
     }
 
     revalidatePath("/");
@@ -341,12 +347,8 @@ export async function deleteHeroSlide(id: string, imageUrl: string): Promise<Act
     const { error } = await supabase.from("hero_slides").delete().eq("id", id);
     if (error) return { ok: false, error: error.message };
 
-    const marker = "/storage/v1/object/public/portfolio/";
-    const idx = imageUrl.indexOf(marker);
-    if (idx !== -1) {
-      const path = decodeURIComponent(imageUrl.slice(idx + marker.length));
-      await supabase.storage.from("portfolio").remove([path]);
-    }
+    const path = portfolioPathFromUrl(imageUrl);
+    if (path) await supabase.storage.from("portfolio").remove([path]);
 
     revalidatePath("/");
     revalidatePath("/admin/site");
@@ -375,6 +377,115 @@ export async function updateHeroOrder(id: string, direction: "up" | "down"): Pro
     await Promise.all([
       supabase.from("hero_slides").update({ sort_order: neighbor.sort_order }).eq("id", current.id),
       supabase.from("hero_slides").update({ sort_order: current.sort_order }).eq("id", neighbor.id),
+    ]);
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al reordenar." };
+  }
+}
+
+export async function createBeforeAfterPair(formData: FormData): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const beforeFile = formData.get("before");
+    const afterFile = formData.get("after");
+
+    if (!(beforeFile instanceof File) || beforeFile.size === 0) {
+      return { ok: false, error: "Sube la foto de antes." };
+    }
+    if (!(afterFile instanceof File) || afterFile.size === 0) {
+      return { ok: false, error: "Sube la foto de después." };
+    }
+
+    const beforeUrl = await uploadPortfolioFile(supabase, "before-after", beforeFile);
+    const afterUrl = await uploadPortfolioFile(supabase, "before-after", afterFile);
+
+    const { data: last } = await supabase
+      .from("before_after_pairs")
+      .select("sort_order")
+      .order("sort_order", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const { error } = await supabase.from("before_after_pairs").insert({
+      before_image_url: beforeUrl,
+      after_image_url: afterUrl,
+      title: String(formData.get("title") ?? "").trim(),
+      before_label: String(formData.get("before_label") ?? "").trim(),
+      after_label: String(formData.get("after_label") ?? "").trim(),
+      is_published: true,
+      sort_order: (last?.sort_order ?? 0) + 1,
+    });
+
+    if (error) {
+      return {
+        ok: false,
+        error: missingTableMessage(error, "supabase/migration-before-after.sql"),
+      };
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al subir." };
+  }
+}
+
+export async function deleteBeforeAfterPair(
+  id: string,
+  beforeUrl: string,
+  afterUrl: string,
+): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { error } = await supabase.from("before_after_pairs").delete().eq("id", id);
+    if (error) return { ok: false, error: error.message };
+
+    const paths = [portfolioPathFromUrl(beforeUrl), portfolioPathFromUrl(afterUrl)].filter(
+      (path): path is string => Boolean(path),
+    );
+    if (paths.length) await supabase.storage.from("portfolio").remove(paths);
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al eliminar." };
+  }
+}
+
+export async function updateBeforeAfterOrder(
+  id: string,
+  direction: "up" | "down",
+): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { data: items, error } = await supabase
+      .from("before_after_pairs")
+      .select("id, sort_order")
+      .order("sort_order", { ascending: true });
+
+    if (error || !items) return { ok: false, error: error?.message ?? "Sin datos." };
+
+    const index = items.findIndex((item) => item.id === id);
+    const swapWith = direction === "up" ? index - 1 : index + 1;
+    if (index < 0 || swapWith < 0 || swapWith >= items.length) return { ok: true };
+
+    const current = items[index];
+    const neighbor = items[swapWith];
+    await Promise.all([
+      supabase
+        .from("before_after_pairs")
+        .update({ sort_order: neighbor.sort_order })
+        .eq("id", current.id),
+      supabase
+        .from("before_after_pairs")
+        .update({ sort_order: current.sort_order })
+        .eq("id", neighbor.id),
     ]);
 
     revalidatePath("/");

@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { SEED_PACKAGES, SEED_PORTFOLIO, SEED_TESTIMONIALS } from "@/lib/data/seed";
-import { DEFAULT_HERO_SLIDES, DEFAULT_SETTINGS } from "@/lib/site";
+import { DEFAULT_BEFORE_AFTER, DEFAULT_HERO_SLIDES, DEFAULT_SETTINGS } from "@/lib/site";
 import type {
+  BeforeAfterPair,
   HeroSlide,
   Inquiry,
   PortfolioItem,
@@ -210,4 +211,44 @@ function mapHero(row: Record<string, unknown>): HeroSlide {
     sort_order: Number(row.sort_order ?? 0),
     is_published: row.is_published !== false,
   };
+}
+
+function mapBeforeAfter(row: Record<string, unknown>): BeforeAfterPair {
+  return {
+    id: String(row.id),
+    before_image_url: String(row.before_image_url),
+    after_image_url: String(row.after_image_url),
+    title: String(row.title ?? ""),
+    before_label: String(row.before_label ?? ""),
+    after_label: String(row.after_label ?? ""),
+    sort_order: Number(row.sort_order ?? 0),
+    is_published: row.is_published !== false,
+  };
+}
+
+export async function getBeforeAfterPairs(): Promise<BeforeAfterPair[]> {
+  const supabase = await createClient();
+  if (!supabase) return DEFAULT_BEFORE_AFTER;
+
+  const { data, error } = await supabase
+    .from("before_after_pairs")
+    .select("*")
+    .eq("is_published", true)
+    .order("sort_order", { ascending: true });
+
+  if (error || !data?.length) return DEFAULT_BEFORE_AFTER;
+  return data.map(mapBeforeAfter);
+}
+
+export async function getAllBeforeAfterPairs(): Promise<BeforeAfterPair[]> {
+  const supabase = await createClient();
+  if (!supabase) return DEFAULT_BEFORE_AFTER;
+
+  const { data, error } = await supabase
+    .from("before_after_pairs")
+    .select("*")
+    .order("sort_order", { ascending: true });
+
+  if (error) return [];
+  return (data ?? []).map(mapBeforeAfter);
 }

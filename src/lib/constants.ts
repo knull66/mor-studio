@@ -1,9 +1,21 @@
+function resolveSiteUrl() {
+  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  if (fromEnv && !fromEnv.includes("localhost")) return fromEnv;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return fromEnv ?? "https://www.morstudio.vip";
+}
+
 export const SITE = {
   name: "MOR Studio",
   tagline: "Photography and Makeup",
   artist: "Elisabeth Morao",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://morstudio.com",
-  email: "hello@morstudio.com",
+  url: resolveSiteUrl(),
+  email: "booking@morstudio.vip",
   phoneDisplay: "+1 (210) 548-5300",
   phoneTel: "+12105485300",
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "12105485300",

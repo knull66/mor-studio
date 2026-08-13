@@ -40,6 +40,10 @@ export const metadata: Metadata = {
     "maquillaje de novia San Antonio",
     "fotografía de bodas Texas",
   ],
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png", type: "image/png" }],
+  },
   openGraph: {
     title: `${SITE.name} · ${SITE.tagline}`,
     description:
@@ -48,12 +52,22 @@ export const metadata: Metadata = {
     alternateLocale: ["en_US"],
     type: "website",
     url: SITE.url,
+    siteName: SITE.name,
+    images: [
+      {
+        url: "/images/og-mor.png?v=20260813",
+        width: 1200,
+        height: 630,
+        alt: "MOR Photography",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE.name} · ${SITE.tagline}`,
     description:
       "Photography and makeup studio in San Antonio, Texas, led by Elisabeth Morao.",
+    images: ["/images/og-mor.png?v=20260813"],
   },
 };
 

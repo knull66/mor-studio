@@ -85,3 +85,14 @@ export type HeroSlide = {
   sort_order: number;
   is_published: boolean;
 };
+
+export type BeforeAfterPair = {
+  id: string;
+  before_image_url: string;
+  after_image_url: string;
+  title: string;
+  before_label: string;
+  after_label: string;
+  sort_order: number;
+  is_published: boolean;
+};

@@ -1,6 +1,6 @@
 import { SITE } from "@/lib/constants";
-import type { HeroSlide, SiteSettings } from "@/lib/types";
-import { HERO_SLIDES } from "@/lib/data/seed";
+import type { BeforeAfterPair, HeroSlide, SiteSettings } from "@/lib/types";
+import { BEFORE_AFTER, HERO_SLIDES } from "@/lib/data/seed";
 
 export const DEFAULT_SETTINGS: SiteSettings = {
   instagram: SITE.instagram,
@@ -20,6 +20,19 @@ export const DEFAULT_HERO_SLIDES: HeroSlide[] = HERO_SLIDES.map((slide, index) =
   sort_order: index + 1,
   is_published: true,
 }));
+
+export const DEFAULT_BEFORE_AFTER: BeforeAfterPair[] = [
+  {
+    id: "seed-before-after",
+    before_image_url: BEFORE_AFTER.before,
+    after_image_url: BEFORE_AFTER.after,
+    title: "",
+    before_label: "",
+    after_label: "",
+    sort_order: 1,
+    is_published: true,
+  },
+];
 
 export function digitsOnly(value: string) {
   return value.replace(/\D/g, "");

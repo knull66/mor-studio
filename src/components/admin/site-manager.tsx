@@ -6,24 +6,30 @@ import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import {
+  createBeforeAfterPair,
   createHeroSlide,
+  deleteBeforeAfterPair,
   deleteHeroSlide,
+  updateBeforeAfterOrder,
   updateHeroOrder,
   updateSiteSettings,
 } from "@/app/actions";
-import type { HeroSlide, SiteSettings } from "@/lib/types";
+import type { BeforeAfterPair, HeroSlide, SiteSettings } from "@/lib/types";
 
 export function SiteManager({
   settings,
   slides,
+  beforeAfter,
 }: {
   settings: SiteSettings;
   slides: HeroSlide[];
+  beforeAfter: BeforeAfterPair[];
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingPair, setUploadingPair] = useState(false);
   const [dragging, setDragging] = useState(false);
 
   async function onSaveSettings(event: React.FormEvent<HTMLFormElement>) {
@@ -215,6 +221,131 @@ export function SiteManager({
                       onClick={async () => {
                         if (!confirm("¿Quitar esta foto del slider?")) return;
                         const result = await deleteHeroSlide(item.id, item.image_url);
+                        if (!result.ok) toast.error(result.error);
+                        else toast.success("Eliminada.");
+                        router.refresh();
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-[0.65rem] uppercase tracking-widest text-muted">Demo</p>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="font-serif text-2xl">Antes y después</h2>
+        <p className="mt-1 mb-6 text-sm text-muted">
+          Pares de fotos para el comparador de la web. Si no subes ninguno, se muestra el ejemplo de
+          demostración.
+        </p>
+        <form
+          onSubmit={async (event) => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            setUploadingPair(true);
+            const result = await createBeforeAfterPair(new FormData(form));
+            setUploadingPair(false);
+            if (!result.ok) {
+              toast.error(result.error);
+              return;
+            }
+            toast.success("Comparación añadida.");
+            form.reset();
+            router.refresh();
+          }}
+          className="border border-dashed border-sand-deep bg-cream p-6"
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="text-xs uppercase tracking-[0.16em] text-muted">
+              Foto de antes
+              <input required type="file" name="before" accept="image/*" className="mt-2 block w-full text-sm" />
+            </label>
+            <label className="text-xs uppercase tracking-[0.16em] text-muted">
+              Foto de después
+              <input required type="file" name="after" accept="image/*" className="mt-2 block w-full text-sm" />
+            </label>
+            <input
+              name="title"
+              placeholder="Título (opcional)"
+              className="border border-sand-deep bg-white px-3 py-2 text-sm outline-none"
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                name="before_label"
+                placeholder="Etiqueta antes"
+                className="border border-sand-deep bg-white px-3 py-2 text-sm outline-none"
+              />
+              <input
+                name="after_label"
+                placeholder="Etiqueta después"
+                className="border border-sand-deep bg-white px-3 py-2 text-sm outline-none"
+              />
+            </div>
+          </div>
+          <button type="submit" disabled={uploadingPair} className="solid-btn mt-4">
+            {uploadingPair ? "Subiendo…" : "Añadir comparación"}
+          </button>
+        </form>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {beforeAfter.map((item, index) => (
+            <article key={item.id} className="overflow-hidden border border-sand-deep bg-cream">
+              <div className="grid grid-cols-2">
+                <div className="relative aspect-[4/5]">
+                  <Image src={item.before_image_url} alt={item.before_label || "Antes"} fill className="object-cover" />
+                  <span className="absolute bottom-2 left-2 bg-cream/90 px-2 py-0.5 text-[0.58rem] uppercase tracking-widest">
+                    {item.before_label || "Antes"}
+                  </span>
+                </div>
+                <div className="relative aspect-[4/5]">
+                  <Image src={item.after_image_url} alt={item.after_label || "Después"} fill className="object-cover" />
+                  <span className="absolute right-2 bottom-2 bg-charcoal/85 px-2 py-0.5 text-[0.58rem] uppercase tracking-widest text-cream">
+                    {item.after_label || "Después"}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-2 p-3">
+                <p className="text-sm">{item.title || `Comparación ${index + 1}`}</p>
+                {!item.id.startsWith("seed-") ? (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      disabled={index === 0}
+                      className="p-1 disabled:opacity-30"
+                      onClick={async () => {
+                        await updateBeforeAfterOrder(item.id, "up");
+                        router.refresh();
+                      }}
+                    >
+                      <ArrowUp className="size-4" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={index === beforeAfter.length - 1}
+                      className="p-1 disabled:opacity-30"
+                      onClick={async () => {
+                        await updateBeforeAfterOrder(item.id, "down");
+                        router.refresh();
+                      }}
+                    >
+                      <ArrowDown className="size-4" />
+                    </button>
+                    <button
+                      type="button"
+                      className="p-1 text-red-700"
+                      onClick={async () => {
+                        if (!confirm("¿Quitar esta comparación?")) return;
+                        const result = await deleteBeforeAfterPair(
+                          item.id,
+                          item.before_image_url,
+                          item.after_image_url,
+                        );
                         if (!result.ok) toast.error(result.error);
                         else toast.success("Eliminada.");
                         router.refresh();

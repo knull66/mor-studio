@@ -9,13 +9,14 @@ import { InstagramStrip } from "@/components/home/instagram-strip";
 import { PackagesSection } from "@/components/home/packages-section";
 import { PortfolioGallery } from "@/components/home/portfolio-gallery";
 import { Testimonials } from "@/components/home/testimonials";
-import { getPackages, getPortfolio, getTestimonials } from "@/lib/data/queries";
+import { getBeforeAfterPairs, getPackages, getPortfolio, getTestimonials } from "@/lib/data/queries";
 
 export default async function HomePage() {
-  const [packages, portfolio, testimonials] = await Promise.all([
+  const [packages, portfolio, testimonials, beforeAfter] = await Promise.all([
     getPackages(),
     getPortfolio(),
     getTestimonials(),
+    getBeforeAfterPairs(),
   ]);
 
   return (
@@ -23,7 +24,7 @@ export default async function HomePage() {
       <Hero />
       <Categories />
       <About />
-      <BeforeAfter />
+      <BeforeAfter pairs={beforeAfter} />
       <PackagesSection packages={packages} />
       <PortfolioGallery items={portfolio} />
       <Testimonials items={testimonials} />
