@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { SplashIntro } from "@/components/layout/splash-intro";
 import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { getHeroSlides, getSiteSettings } from "@/lib/data/queries";
 import { defaultLocale, isLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
@@ -20,6 +21,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <main className="flex-1">{children}</main>
         <Footer />
         <WhatsAppFloat />
+        <SplashIntro />
       </SiteProvider>
     </LanguageProvider>
   );

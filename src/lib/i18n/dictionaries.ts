@@ -395,6 +395,12 @@ const es = {
     title: "Esta página no existe",
     back: "Volver al inicio",
   },
+  splash: {
+    title: "MOR Studio",
+    subtitle: "Fotografía · Maquillaje · Peinados",
+    location: "San Antonio, Texas",
+    skip: "Saltar introducción",
+  },
   meta: {
     title: "MOR Studio · Fotografía, maquillaje y peinados",
     description:
@@ -793,6 +799,12 @@ const en: typeof es = {
   notFound: {
     title: "This page does not exist",
     back: "Back to home",
+  },
+  splash: {
+    title: "MOR Studio",
+    subtitle: "Photography · Makeup · Hair",
+    location: "San Antonio, Texas",
+    skip: "Skip introduction",
   },
   meta: {
     title: "MOR Studio · Photography, makeup & hair",
