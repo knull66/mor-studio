@@ -96,23 +96,25 @@ function TeamCard({ member }: { member: TeamMember }) {
   const photo = member.image_url || member.image_url_2;
 
   return (
-    <article>
+    <article className="mx-auto w-full max-w-[220px]">
       {photo ? (
         <div className="relative aspect-[3/4] overflow-hidden bg-cream">
           <Image
             src={photo}
             alt={copy.name}
             fill
-            sizes="(max-width: 640px) 100vw, 33vw"
+            sizes="220px"
             className="object-cover object-top"
           />
         </div>
       ) : null}
-      <h3 className="mt-5 font-serif text-3xl">{copy.name}</h3>
+      <h3 className="mt-3 font-serif text-xl leading-tight">{copy.name}</h3>
       {copy.role ? (
-        <p className="mt-1 text-[0.65rem] uppercase tracking-[0.2em] text-muted">{copy.role}</p>
+        <p className="mt-1 text-[0.58rem] uppercase tracking-[0.18em] text-muted">{copy.role}</p>
       ) : null}
-      {copy.bio ? <p className="mt-3 text-sm leading-relaxed text-muted">{copy.bio}</p> : null}
+      {copy.bio ? (
+        <p className="mt-2 line-clamp-4 text-xs leading-relaxed text-muted">{copy.bio}</p>
+      ) : null}
     </article>
   );
 }
@@ -145,7 +147,7 @@ export function About({ members }: { members: TeamMember[] }) {
       />
 
       {others.length ? (
-        <div className="mx-auto mt-20 grid max-w-7xl gap-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mx-auto mt-16 flex max-w-5xl flex-wrap justify-center gap-8">
           {others.map((member, index) => (
             <Reveal key={member.id} delay={index * 0.08}>
               <TeamCard member={member} />
