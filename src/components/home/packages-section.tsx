@@ -7,6 +7,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { PACKAGE_TAB_IDS } from "@/lib/constants";
 import { useI18n } from "@/lib/i18n/language-provider";
 import { useSite } from "@/lib/site-provider";
+import { localizedPackage } from "@/lib/packages";
 import type { PackageCategory, ServicePackage } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 import { whatsappUrl } from "@/lib/whatsapp";
@@ -58,17 +59,7 @@ export function PackagesSection({ packages }: { packages: ServicePackage[] }) {
       ) : (
       <div className="mx-auto mt-12 grid max-w-7xl gap-6 md:grid-cols-2 xl:grid-cols-3">
         {visible.map((item, index) => {
-          const copy = t.packageItems[item.id];
-          const title =
-            copy?.title ?? (locale === "en" && item.title_en ? item.title_en : item.title);
-          const duration =
-            copy?.duration ?? (locale === "en" && item.duration_en ? item.duration_en : item.duration);
-          const description =
-            copy?.description ??
-            (locale === "en" && item.description_en ? item.description_en : item.description);
-          const features =
-            copy?.features ??
-            (locale === "en" && item.features_en?.length ? item.features_en : item.features);
+          const { title, duration, description, features } = localizedPackage(item, locale, t);
           const priceLabel = formatPrice(item.price, locale);
 
           return (

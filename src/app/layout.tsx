@@ -92,7 +92,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     "@context": "https://schema.org",
     "@type": "BeautySalon",
     name: SITE.name,
-    founder: SITE.artist,
+    founder: {
+      "@type": "Person",
+      name: SITE.artist,
+      jobTitle:
+        locale === "es"
+          ? "Fotógrafa profesional y maquillista"
+          : "Professional photographer and makeup artist",
+    },
     description: t.meta.description,
     url: SITE.url,
     telephone: settings.phone_display,

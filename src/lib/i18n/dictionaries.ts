@@ -51,12 +51,12 @@ const es = {
   about: {
     eyebrow: "La artista",
     title: "Elisabeth Morao",
-    role: "Fundadora · Maquillista y fotógrafa",
-    p1: "Elisabeth Morao es la artista y dueña de MOR Studio. Une maquillaje y fotografía en una sola mirada: prepara la piel para la cámara y dirige la luz para la piel, sin prisas ni looks que no sobreviven al flash.",
+    role: "Fundadora · Maquillista y fotógrafa profesional",
+    p1: "Elisabeth Morao es la artista, dueña y fotógrafa profesional de MOR Studio. Une maquillaje y fotografía en una sola mirada: prepara la piel para la cámara y dirige la luz para la piel, sin prisas ni looks que no sobreviven al flash.",
     p2: "Desde San Antonio y el Hill Country, Texas, acompaña a novias, quinceañeras, familias y marcas que buscan un lujo cálido: menos filtro, más presencia. Cada sesión se siente íntima, editorial y hecha a tu medida.",
     cta: "Reservar con Elisabeth",
-    photoAlt1: "Elisabeth Morao, artista y dueña de MOR Studio",
-    photoAlt2: "Retrato de estudio de Elisabeth Morao",
+    photoAlt1: "Elisabeth Morao, fotógrafa profesional y dueña de MOR Studio",
+    photoAlt2: "Retrato de estudio de Elisabeth Morao, fotógrafa profesional",
   },
   beforeAfter: {
     eyebrow: "El detalle que cambia todo",
@@ -404,7 +404,7 @@ const es = {
   meta: {
     title: "MOR Studio · Fotografía, maquillaje y peinados",
     description:
-      "MOR Studio en San Antonio y el Hill Country, Texas. Fotografía, maquillaje y peinados de Elisabeth Morao para novias, bodas, quinceañeras y retrato editorial.",
+      "MOR Studio en San Antonio y el Hill Country, Texas. Fotografía profesional, maquillaje y peinados de Elisabeth Morao para novias, bodas, quinceañeras y retrato editorial.",
   },
 };
 
@@ -459,12 +459,12 @@ const en: typeof es = {
   about: {
     eyebrow: "The artist",
     title: "Elisabeth Morao",
-    role: "Founder · Makeup artist & photographer",
-    p1: "Elisabeth Morao is the artist and owner of MOR Studio. She brings makeup and photography into a single point of view: skin prepared for the camera, light directed for the skin — no rush, no looks that disappear under flash.",
+    role: "Founder · Makeup artist & professional photographer",
+    p1: "Elisabeth Morao is the artist, owner, and professional photographer of MOR Studio. She brings makeup and photography into a single point of view: skin prepared for the camera, light directed for the skin — no rush, no looks that disappear under flash.",
     p2: "From San Antonio and the Texas Hill Country, she works with brides, quinceañeras, families, and brands who want warm luxury: less filter, more presence. Every session feels intimate, editorial, and made for you.",
     cta: "Book with Elisabeth",
-    photoAlt1: "Elisabeth Morao, artist and owner of MOR Studio",
-    photoAlt2: "Studio portrait of Elisabeth Morao",
+    photoAlt1: "Elisabeth Morao, professional photographer and owner of MOR Studio",
+    photoAlt2: "Studio portrait of Elisabeth Morao, professional photographer",
   },
   beforeAfter: {
     eyebrow: "The detail that changes everything",
@@ -809,7 +809,7 @@ const en: typeof es = {
   meta: {
     title: "MOR Studio · Photography, makeup & hair",
     description:
-      "MOR Studio in San Antonio and the Texas Hill Country. Photography, makeup, and hair by Elisabeth Morao for brides, weddings, quinceañeras, and editorial portrait.",
+      "MOR Studio in San Antonio and the Texas Hill Country. Professional photography, makeup, and hair by Elisabeth Morao for brides, weddings, quinceañeras, and editorial portrait.",
   },
 };
 
