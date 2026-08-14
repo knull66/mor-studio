@@ -1,5 +1,5 @@
 import { SITE } from "@/lib/constants";
-import type { BeforeAfterPair, HeroSlide, InstagramStripItem, SiteSettings } from "@/lib/types";
+import type { BeforeAfterPair, HeroSlide, InstagramStripItem, SiteSettings, TeamMember } from "@/lib/types";
 import { BEFORE_AFTER, HERO_SLIDES, INSTAGRAM_STRIP } from "@/lib/data/seed";
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -48,6 +48,27 @@ export const DEFAULT_INSTAGRAM_STRIP: InstagramStripItem[] = INSTAGRAM_STRIP.map
   sort_order: index + 1,
   is_published: true,
 }));
+
+export const DEFAULT_TEAM: TeamMember[] = [
+  {
+    id: "seed-elisabeth",
+    name: "Elisabeth Morao",
+    role: "Fundadora · Maquillista y fotógrafa profesional",
+    role_en: "Founder · Makeup artist & professional photographer",
+    bio: "Elisabeth Morao es la artista, dueña y fotógrafa profesional de MOR Studio. Une maquillaje y fotografía en una sola mirada: prepara la piel para la cámara y dirige la luz para la piel, sin prisas ni looks que no sobreviven al flash.",
+    bio_en:
+      "Elisabeth Morao is the artist, owner, and professional photographer of MOR Studio. She brings makeup and photography into a single point of view: skin prepared for the camera, light directed for the skin — no rush, no looks that disappear under flash.",
+    bio_2:
+      "Desde San Antonio y el Hill Country, Texas, acompaña a novias, quinceañeras, familias y marcas que buscan un lujo cálido: menos filtro, más presencia. Cada sesión se siente íntima, editorial y hecha a tu medida.",
+    bio_2_en:
+      "From San Antonio and the Texas Hill Country, she works with brides, quinceañeras, families, and brands who want warm luxury: less filter, more presence. Every session feels intimate, editorial, and made for you.",
+    image_url: SITE.artistPhotos[0],
+    image_url_2: SITE.artistPhotos[1],
+    is_founder: true,
+    is_published: true,
+    sort_order: 1,
+  },
+];
 
 export function heroImageStyle(slide: Pick<HeroSlide, "focal_x" | "focal_y" | "zoom">) {
   const x = clamp(slide.focal_x ?? 50, 0, 100);

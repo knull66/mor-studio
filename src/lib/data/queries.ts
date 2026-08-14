@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { SEED_PACKAGES, SEED_PORTFOLIO, SEED_TESTIMONIALS } from "@/lib/data/seed";
-import { DEFAULT_BEFORE_AFTER, DEFAULT_HERO_SLIDES, DEFAULT_INSTAGRAM_STRIP, DEFAULT_SETTINGS } from "@/lib/site";
+import { DEFAULT_BEFORE_AFTER, DEFAULT_HERO_SLIDES, DEFAULT_INSTAGRAM_STRIP, DEFAULT_SETTINGS, DEFAULT_TEAM } from "@/lib/site";
 import type {
   BeforeAfterPair,
   HeroSlide,
@@ -9,6 +9,7 @@ import type {
   PortfolioItem,
   ServicePackage,
   SiteSettings,
+  TeamMember,
   Testimonial,
 } from "@/lib/types";
 
@@ -334,4 +335,49 @@ export async function getAllInstagramStrip(): Promise<InstagramStripItem[]> {
 
   if (error) return [];
   return (data ?? []).map(mapInstagramStrip);
+}
+
+function mapTeamMember(row: Record<string, unknown>): TeamMember {
+  return {
+    id: String(row.id),
+    name: String(row.name ?? ""),
+    role: String(row.role ?? ""),
+    role_en: String(row.role_en ?? ""),
+    bio: String(row.bio ?? ""),
+    bio_en: String(row.bio_en ?? ""),
+    bio_2: String(row.bio_2 ?? ""),
+    bio_2_en: String(row.bio_2_en ?? ""),
+    image_url: String(row.image_url ?? ""),
+    image_url_2: String(row.image_url_2 ?? ""),
+    is_founder: row.is_founder === true,
+    is_published: row.is_published !== false,
+    sort_order: Number(row.sort_order ?? 0),
+  };
+}
+
+export async function getTeamMembers(): Promise<TeamMember[]> {
+  const supabase = await createClient();
+  if (!supabase) return DEFAULT_TEAM;
+
+  const { data, error } = await supabase
+    .from("team_members")
+    .select("*")
+    .eq("is_published", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) return isMissingRelation(error) ? DEFAULT_TEAM : [];
+  return (data ?? []).map(mapTeamMember);
+}
+
+export async function getAllTeamMembers(): Promise<TeamMember[]> {
+  const supabase = await createClient();
+  if (!supabase) return DEFAULT_TEAM;
+
+  const { data, error } = await supabase
+    .from("team_members")
+    .select("*")
+    .order("sort_order", { ascending: true });
+
+  if (error) return [];
+  return (data ?? []).map(mapTeamMember);
 }

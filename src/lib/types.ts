@@ -115,3 +115,19 @@ export type InstagramStripItem = {
   sort_order: number;
   is_published: boolean;
 };
+
+export type TeamMember = {
+  id: string;
+  name: string;
+  role: string;
+  role_en: string;
+  bio: string;
+  bio_en: string;
+  bio_2: string;
+  bio_2_en: string;
+  image_url: string;
+  image_url_2: string;
+  is_founder: boolean;
+  is_published: boolean;
+  sort_order: number;
+};

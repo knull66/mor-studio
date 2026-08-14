@@ -716,3 +716,108 @@ export async function deleteTestimonial(id: string): Promise<ActionResult> {
     return { ok: false, error: error instanceof Error ? error.message : "Error al eliminar." };
   }
 }
+
+export async function upsertTeamMember(formData: FormData): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const id = String(formData.get("id") ?? "");
+    const name = String(formData.get("name") ?? "").trim();
+    if (!name) return { ok: false, error: "El nombre es obligatorio." };
+
+    const file = formData.get("image");
+    const file2 = formData.get("image_2");
+    let imageUrl: string | undefined;
+    let imageUrl2: string | undefined;
+
+    if (file instanceof File && file.size > 0) {
+      imageUrl = await uploadPortfolioFile(supabase, "team", file);
+    }
+    if (file2 instanceof File && file2.size > 0) {
+      imageUrl2 = await uploadPortfolioFile(supabase, "team", file2);
+    }
+
+    const payload: Record<string, unknown> = {
+      name,
+      role: String(formData.get("role") ?? "").trim(),
+      role_en: String(formData.get("role_en") ?? "").trim() || null,
+      bio: String(formData.get("bio") ?? "").trim(),
+      bio_en: String(formData.get("bio_en") ?? "").trim() || null,
+      bio_2: String(formData.get("bio_2") ?? "").trim() || null,
+      bio_2_en: String(formData.get("bio_2_en") ?? "").trim() || null,
+      is_founder: formData.get("is_founder") === "on",
+      is_published: formData.get("is_published") === "on",
+      sort_order: Number(formData.get("sort_order") ?? 0),
+    };
+
+    if (imageUrl) payload.image_url = imageUrl;
+    if (imageUrl2) payload.image_url_2 = imageUrl2;
+    if (formData.get("remove_image_2") === "on") payload.image_url_2 = null;
+
+    if (!id && !imageUrl) {
+      return { ok: false, error: "Sube al menos una foto para el perfil." };
+    }
+
+    const query = id
+      ? supabase.from("team_members").update(payload).eq("id", id)
+      : supabase.from("team_members").insert(payload);
+
+    const { error } = await query;
+    if (error) {
+      return { ok: false, error: missingTableMessage(error, "supabase/migration-team.sql") };
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/team");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al guardar." };
+  }
+}
+
+export async function deleteTeamMember(id: string, imageUrl?: string, imageUrl2?: string): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { error } = await supabase.from("team_members").delete().eq("id", id);
+    if (error) return { ok: false, error: error.message };
+
+    const paths = [imageUrl, imageUrl2]
+      .map((url) => (url ? portfolioPathFromUrl(url) : null))
+      .filter((path): path is string => Boolean(path));
+    if (paths.length) await supabase.storage.from("portfolio").remove(paths);
+
+    revalidatePath("/");
+    revalidatePath("/admin/team");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al eliminar." };
+  }
+}
+
+export async function updateTeamOrder(id: string, direction: "up" | "down"): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { data: items, error } = await supabase
+      .from("team_members")
+      .select("id, sort_order")
+      .order("sort_order", { ascending: true });
+
+    if (error || !items) return { ok: false, error: error?.message ?? "Sin datos." };
+
+    const index = items.findIndex((item) => item.id === id);
+    const swapWith = direction === "up" ? index - 1 : index + 1;
+    if (index < 0 || swapWith < 0 || swapWith >= items.length) return { ok: true };
+
+    const current = items[index];
+    const neighbor = items[swapWith];
+    await Promise.all([
+      supabase.from("team_members").update({ sort_order: neighbor.sort_order }).eq("id", current.id),
+      supabase.from("team_members").update({ sort_order: current.sort_order }).eq("id", neighbor.id),
+    ]);
+
+    revalidatePath("/");
+    revalidatePath("/admin/team");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al reordenar." };
+  }
+}

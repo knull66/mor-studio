@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Camera, Globe, LayoutDashboard, LogOut, MessageSquare, Package, Quote } from "lucide-react";
+import { Camera, Globe, LayoutDashboard, LogOut, MessageSquare, Package, Quote, Users } from "lucide-react";
 import { signOut } from "@/app/actions";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/admin", label: "Resumen", icon: LayoutDashboard },
   { href: "/admin/site", label: "Sitio y slider", icon: Globe },
+  { href: "/admin/team", label: "Equipo", icon: Users },
   { href: "/admin/portfolio", label: "Portafolio", icon: Camera },
   { href: "/admin/packages", label: "Paquetes", icon: Package },
   { href: "/admin/testimonials", label: "Testimonios", icon: Quote },
