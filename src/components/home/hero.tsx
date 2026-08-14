@@ -6,6 +6,7 @@ import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n/language-provider";
+import { heroImageStyle } from "@/lib/site";
 import { useSite } from "@/lib/site-provider";
 import { cn } from "@/lib/utils";
 
@@ -63,6 +64,7 @@ export function Hero() {
                   priority
                   sizes="100vw"
                   className="object-cover"
+                  style={heroImageStyle(slide)}
                 />
               </div>
             ))}

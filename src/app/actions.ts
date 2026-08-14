@@ -431,6 +431,39 @@ export async function updateHeroOrder(id: string, direction: "up" | "down"): Pro
   }
 }
 
+export async function updateHeroSlide(formData: FormData): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const id = String(formData.get("id") ?? "");
+    if (!id) return { ok: false, error: "Falta el identificador." };
+
+    const focalX = Math.min(100, Math.max(0, Number(formData.get("focal_x") ?? 50)));
+    const focalY = Math.min(100, Math.max(0, Number(formData.get("focal_y") ?? 50)));
+    const zoom = Math.min(200, Math.max(100, Number(formData.get("zoom") ?? 100)));
+
+    const { error } = await supabase
+      .from("hero_slides")
+      .update({
+        alt: String(formData.get("alt") ?? "").trim(),
+        caption: String(formData.get("caption") ?? "").trim(),
+        focal_x: Number.isFinite(focalX) ? focalX : 50,
+        focal_y: Number.isFinite(focalY) ? focalY : 50,
+        zoom: Number.isFinite(zoom) ? zoom : 100,
+      })
+      .eq("id", id);
+
+    if (error) {
+      return { ok: false, error: missingTableMessage(error, "supabase/migration-hero-crop.sql") };
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/site");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al guardar." };
+  }
+}
+
 export async function createBeforeAfterPair(formData: FormData): Promise<ActionResult> {
   try {
     const supabase = await requireUser();

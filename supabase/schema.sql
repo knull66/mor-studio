@@ -197,6 +197,9 @@ create table if not exists public.hero_slides (
   image_url text not null,
   alt text,
   caption text,
+  focal_x numeric default 50,
+  focal_y numeric default 50,
+  zoom numeric default 100,
   sort_order int default 0,
   is_published boolean default true,
   created_at timestamptz default timezone('utc'::text, now())
@@ -241,6 +244,9 @@ alter table public.packages add column if not exists features_en text[];
 alter table public.packages add column if not exists duration_en text;
 alter table public.testimonials add column if not exists quote_en text;
 alter table public.testimonials add column if not exists role_en text;
+alter table public.hero_slides add column if not exists focal_x numeric default 50;
+alter table public.hero_slides add column if not exists focal_y numeric default 50;
+alter table public.hero_slides add column if not exists zoom numeric default 100;
 
 create table if not exists public.before_after_pairs (
   id uuid primary key default gen_random_uuid(),

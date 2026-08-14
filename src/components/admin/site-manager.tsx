@@ -17,6 +17,8 @@ import {
   updateInstagramStripOrder,
   updateSiteSettings,
 } from "@/app/actions";
+import { HeroCropEditor } from "@/components/admin/hero-crop-editor";
+import { heroImageStyle } from "@/lib/site";
 import type { BeforeAfterPair, HeroSlide, InstagramStripItem, SiteSettings } from "@/lib/types";
 
 export function SiteManager({
@@ -181,7 +183,8 @@ export function SiteManager({
       <section>
         <h2 className="font-serif text-2xl">Slider de inicio</h2>
         <p className="mt-1 mb-6 text-sm text-muted">
-          Fotos grandes del carrusel principal. Si no subes ninguna, el inicio queda con el texto sobre fondo oscuro. El pie de foto aparece como etiqueta sobre la imagen.
+          Fotos grandes del carrusel principal. Después de subirlas, ajusta recorte, posición y zoom
+          para que el sujeto quede bien en móvil y escritorio.
         </p>
         <form
           onSubmit={onUploadSlide}
@@ -227,8 +230,14 @@ export function SiteManager({
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {slides.map((item, index) => (
             <article key={item.id} className="overflow-hidden border border-sand-deep bg-cream">
-              <div className="relative aspect-[16/10]">
-                <Image src={item.image_url} alt={item.alt || "Slide"} fill className="object-cover" />
+              <div className="relative aspect-[16/10] overflow-hidden">
+                <Image
+                  src={item.image_url}
+                  alt={item.alt || "Slide"}
+                  fill
+                  className="object-cover"
+                  style={heroImageStyle(item)}
+                />
               </div>
               <div className="flex items-center justify-between gap-2 p-3">
                 <p className="text-sm">{item.alt || item.caption || `Foto ${index + 1}`}</p>
@@ -274,6 +283,7 @@ export function SiteManager({
                   <p className="text-[0.65rem] uppercase tracking-widest text-muted">Demo</p>
                 )}
               </div>
+              {!item.id.startsWith("seed-") ? <HeroCropEditor slide={item} /> : null}
             </article>
           ))}
         </div>

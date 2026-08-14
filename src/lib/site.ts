@@ -21,6 +21,9 @@ export const DEFAULT_HERO_SLIDES: HeroSlide[] = HERO_SLIDES.map((slide, index) =
   image_url: slide.src,
   alt: slide.alt,
   caption: slide.caption,
+  focal_x: 50,
+  focal_y: 50,
+  zoom: 100,
   sort_order: index + 1,
   is_published: true,
 }));
@@ -45,6 +48,22 @@ export const DEFAULT_INSTAGRAM_STRIP: InstagramStripItem[] = INSTAGRAM_STRIP.map
   sort_order: index + 1,
   is_published: true,
 }));
+
+export function heroImageStyle(slide: Pick<HeroSlide, "focal_x" | "focal_y" | "zoom">) {
+  const x = clamp(slide.focal_x ?? 50, 0, 100);
+  const y = clamp(slide.focal_y ?? 50, 0, 100);
+  const zoom = clamp(slide.zoom ?? 100, 100, 200);
+  return {
+    objectFit: "cover" as const,
+    objectPosition: `${x}% ${y}%`,
+    transform: `scale(${zoom / 100})`,
+    transformOrigin: `${x}% ${y}%`,
+  };
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
 
 export function digitsOnly(value: string) {
   return value.replace(/\D/g, "");

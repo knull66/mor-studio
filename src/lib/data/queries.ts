@@ -251,6 +251,9 @@ function mapHero(row: Record<string, unknown>): HeroSlide {
     image_url: String(row.image_url),
     alt: String(row.alt ?? ""),
     caption: String(row.caption ?? ""),
+    focal_x: Number.isFinite(Number(row.focal_x)) ? Number(row.focal_x) : 50,
+    focal_y: Number.isFinite(Number(row.focal_y)) ? Number(row.focal_y) : 50,
+    zoom: Number.isFinite(Number(row.zoom)) ? Number(row.zoom) : 100,
     sort_order: Number(row.sort_order ?? 0),
     is_published: row.is_published !== false,
   };

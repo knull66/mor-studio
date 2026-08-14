@@ -18,6 +18,9 @@ create table if not exists public.hero_slides (
   image_url text not null,
   alt text,
   caption text,
+  focal_x numeric default 50,
+  focal_y numeric default 50,
+  zoom numeric default 100,
   sort_order int default 0,
   is_published boolean default true,
   created_at timestamptz default timezone('utc'::text, now())

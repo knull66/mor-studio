@@ -90,6 +90,9 @@ export type HeroSlide = {
   image_url: string;
   alt: string;
   caption: string;
+  focal_x: number;
+  focal_y: number;
+  zoom: number;
   sort_order: number;
   is_published: boolean;
 };
