@@ -65,6 +65,6 @@ export const BOOKING_SERVICE_IDS = [
 
 export const VIBES_DISTRICT = {
   name: "Vibes District",
-  url: "https://www.vibesdistrict.com",
+  url: "https://www.vibesdistrict.pro",
   logo: "/images/vibes-district.png",
 } as const;
