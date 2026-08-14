@@ -95,7 +95,36 @@ export function PackagesManager({ packages }: { packages: ServicePackage[] }) {
           <textarea
             name="features"
             defaultValue={(editing.features ?? []).join("\n")}
-            placeholder="Un beneficio por línea"
+            placeholder="Un beneficio por línea (español)"
+            className="border border-sand-deep px-3 py-2 text-sm md:col-span-2"
+            rows={5}
+          />
+          <p className="text-xs uppercase tracking-[0.16em] text-muted md:col-span-2">
+            Versión en inglés (opcional). Si está vacía, el sitio en EN usa el texto en español.
+          </p>
+          <input
+            name="title_en"
+            defaultValue={editing.title_en}
+            placeholder="Title (English)"
+            className="border border-sand-deep px-3 py-2 text-sm"
+          />
+          <input
+            name="duration_en"
+            defaultValue={editing.duration_en}
+            placeholder="Duration (English)"
+            className="border border-sand-deep px-3 py-2 text-sm"
+          />
+          <textarea
+            name="description_en"
+            defaultValue={editing.description_en}
+            placeholder="Description (English)"
+            className="border border-sand-deep px-3 py-2 text-sm md:col-span-2"
+            rows={3}
+          />
+          <textarea
+            name="features_en"
+            defaultValue={(editing.features_en ?? []).join("\n")}
+            placeholder="One benefit per line (English)"
             className="border border-sand-deep px-3 py-2 text-sm md:col-span-2"
             rows={5}
           />

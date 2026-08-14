@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
-import { NAV_HREFS, SITE } from "@/lib/constants";
+import { NAV_HREFS } from "@/lib/constants";
 import { useI18n } from "@/lib/i18n/language-provider";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +54,7 @@ export function Header() {
               MOR Studio
             </span>
             <span className="mt-0.5 block text-[0.58rem] font-medium uppercase tracking-[0.38em] text-taupe-dark">
-              {SITE.tagline}
+              {t.hero.eyebrow}
             </span>
           </a>
 
@@ -75,6 +75,8 @@ export function Header() {
             <button
               type="button"
               className="p-2"
+              aria-expanded={open}
+              aria-controls="mobile-nav"
               aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
               onClick={() => setOpen((value) => !value)}
             >
@@ -85,7 +87,7 @@ export function Header() {
       </div>
 
       {open ? (
-        <div className="border-t border-sand-deep bg-cream px-6 py-8 lg:hidden">
+        <div id="mobile-nav" className="border-t border-sand-deep bg-cream px-6 py-8 lg:hidden">
           <nav className="flex flex-col items-center gap-5">
             {allLinks.map((item) => (
               <a

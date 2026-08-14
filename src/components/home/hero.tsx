@@ -31,30 +31,50 @@ export function Hero() {
     };
   }, [emblaApi, onSelect]);
 
+  useEffect(() => {
+    if (!emblaApi) return;
+    const autoplay = emblaApi.plugins().autoplay as
+      | { play: () => void; stop: () => void }
+      | undefined;
+    if (!autoplay) return;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      if (media.matches) autoplay.stop();
+      else autoplay.play();
+    };
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, [emblaApi]);
+
+  const activeCaption = slides[index]?.caption;
+
   return (
     <section id="inicio" className="relative h-[88vh] min-h-[560px] overflow-hidden bg-ink">
-      <div className="h-full overflow-hidden" ref={emblaRef}>
-        <div className="flex h-full">
-          {slides.map((slide) => (
-            <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
-              <Image
-                src={slide.image_url}
-                alt={slide.alt || "MOR Studio"}
-                fill
-                priority
-                sizes="100vw"
-                className="object-cover"
-              />
-            </div>
-          ))}
+      {slides.length ? (
+        <div className="h-full overflow-hidden" ref={emblaRef}>
+          <div className="flex h-full">
+            {slides.map((slide) => (
+              <div key={slide.id} className="relative min-w-0 flex-[0_0_100%]">
+                <Image
+                  src={slide.image_url}
+                  alt={slide.alt || "MOR Studio"}
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink/70 via-ink/35 to-transparent" />
 
       <div className="absolute inset-0 mx-auto flex max-w-7xl flex-col justify-center px-6 text-cream">
         <p className="text-[0.7rem] uppercase tracking-[0.32em] text-cream/80">
-          {t.hero.eyebrow}
+          {activeCaption || t.hero.eyebrow}
         </p>
         <h1 className="mt-4 max-w-xl font-serif text-4xl font-medium leading-[1.1] sm:text-6xl md:text-7xl">
           {t.hero.headline}
@@ -79,6 +99,7 @@ export function Hero() {
               key={slide.id}
               type="button"
               aria-label={`${t.hero.goToSlide} ${i + 1}`}
+              aria-current={i === index ? "true" : undefined}
               className={cn(
                 "h-1.5 rounded-full transition-all",
                 i === index ? "w-10 bg-cream" : "w-3 bg-cream/40",

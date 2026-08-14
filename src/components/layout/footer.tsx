@@ -1,8 +1,9 @@
 "use client";
 
-import { NAV_HREFS, SITE } from "@/lib/constants";
+import Image from "next/image";
+import { NAV_HREFS, VIBES_DISTRICT } from "@/lib/constants";
 import { useI18n } from "@/lib/i18n/language-provider";
-import { instagramHandle, socialHref } from "@/lib/site";
+import { socialHref } from "@/lib/site";
 import { useSite } from "@/lib/site-provider";
 
 function InstagramIcon() {
@@ -50,7 +51,7 @@ export function Footer() {
         <div className="text-center md:text-left">
           <p className="font-serif text-3xl tracking-[0.12em]">MOR Studio</p>
           <p className="mt-1 text-[0.58rem] uppercase tracking-[0.32em] text-taupe-dark">
-            {SITE.tagline}
+            {t.hero.eyebrow}
           </p>
           <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted md:max-w-xs">
             {t.footer.blurb}
@@ -87,28 +88,44 @@ export function Footer() {
             {t.footer.join}
           </p>
           <p className="mt-2 font-serif text-2xl">{t.footer.dates}</p>
-          <form className="mt-5 flex flex-col gap-2 sm:flex-row md:justify-end" action="#reservar">
-            <input
-              type="email"
-              required
-              placeholder={t.footer.emailPlaceholder}
-              className="border border-sand-deep bg-white px-4 py-3 text-sm outline-none placeholder:text-muted/70 focus:border-taupe"
-            />
-            <a href="#reservar" className="solid-btn whitespace-nowrap">
-              {t.footer.book}
-            </a>
-          </form>
+          <a href="#reservar" className="solid-btn mt-5 inline-flex">
+            {t.footer.book}
+          </a>
           <p className="mt-4 text-sm text-muted">{settings.address}</p>
           <p className="text-sm text-muted">{settings.phone_display}</p>
-          <p className="text-sm text-muted">{t.info.hours}</p>
+          <p className="text-sm text-muted">{settings.hours || t.info.hours}</p>
         </div>
       </div>
-      <div className="border-t border-sand-deep px-6 py-5 text-center text-[0.7rem] tracking-wide text-muted">
-        © {new Date().getFullYear()} MOR Studio. {t.footer.rights}
-        <span className="mx-2">·</span>
-        <a href="/admin/login" className="underline decoration-taupe/60 underline-offset-4 hover:text-ink">
-          {t.footer.admin}
-        </a>
+      <div className="border-t border-sand-deep px-6 py-5">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
+          <p className="text-center text-[0.7rem] tracking-wide text-muted sm:text-left">
+            © {new Date().getFullYear()} MOR Studio. {t.footer.rights}
+            <span className="mx-2">·</span>
+            <a
+              href="/admin/login"
+              className="underline decoration-taupe/60 underline-offset-4 hover:text-ink"
+            >
+              {t.footer.admin}
+            </a>
+          </p>
+          <a
+            href={VIBES_DISTRICT.url}
+            target="_blank"
+            rel="noreferrer"
+            className="group flex items-center gap-2.5 text-[0.65rem] uppercase tracking-[0.16em] text-muted transition hover:text-ink"
+          >
+            <Image
+              src={VIBES_DISTRICT.logo}
+              alt=""
+              width={36}
+              height={36}
+              className="size-9 object-contain opacity-80 transition group-hover:opacity-100"
+            />
+            <span>
+              {t.footer.developedBy} {VIBES_DISTRICT.name}
+            </span>
+          </a>
+        </div>
       </div>
     </footer>
   );

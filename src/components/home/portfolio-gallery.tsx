@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Expand, X } from "lucide-react";
 import { Reveal } from "@/components/ui/reveal";
@@ -14,6 +14,8 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
   const { t } = useI18n();
   const [filter, setFilter] = useState<"all" | PortfolioCategory>("all");
   const [active, setActive] = useState<PortfolioItem | null>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const visible = useMemo(
     () => (filter === "all" ? items : items.filter((item) => item.category === filter)),
@@ -24,10 +26,23 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
     if (!active) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setActive(null);
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>("button");
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKey);
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = previous;
@@ -59,7 +74,10 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
         ))}
       </div>
       <div className="mx-auto mt-10 grid max-w-6xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
-        {visible.map((item) => (
+        {visible.length === 0 ? (
+          <p className="col-span-full py-12 text-center text-sm text-muted">{t.portfolio.empty}</p>
+        ) : (
+          visible.map((item) => (
           <button
             key={item.id}
             type="button"
@@ -78,11 +96,13 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
               <Expand className="size-5 text-cream opacity-80 drop-shadow sm:opacity-0 sm:group-hover:opacity-100" />
             </span>
           </button>
-        ))}
+        ))
+        )}
       </div>
 
       {active ? (
         <div
+          ref={dialogRef}
           className="fixed inset-0 z-[80] flex items-center justify-center bg-ink/90 p-4"
           onClick={() => setActive(null)}
           role="dialog"
@@ -90,6 +110,7 @@ export function PortfolioGallery({ items }: { items: PortfolioItem[] }) {
           aria-label={active.title}
         >
           <button
+            ref={closeRef}
             type="button"
             className="absolute top-5 right-5 text-cream"
             aria-label={t.portfolio.close}

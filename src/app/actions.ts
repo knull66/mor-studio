@@ -47,6 +47,8 @@ async function uploadPortfolioFile(
 }
 
 export async function submitInquiry(input: InquiryInput): Promise<ActionResult> {
+  if (input.website?.trim()) return { ok: true };
+
   const name = input.client_name.trim();
   const phone = input.phone.trim();
 
@@ -55,7 +57,10 @@ export async function submitInquiry(input: InquiryInput): Promise<ActionResult> 
 
   const supabase = await createClient();
   if (!supabase) {
-    return { ok: true };
+    return {
+      ok: false,
+      error: "El formulario no está conectado. Escríbenos por WhatsApp.",
+    };
   }
 
   const { error } = await supabase.from("inquiries").insert({
@@ -73,6 +78,7 @@ export async function submitInquiry(input: InquiryInput): Promise<ActionResult> 
   }
 
   revalidatePath("/admin/inquiries");
+  revalidatePath("/admin");
   return { ok: true };
 }
 
@@ -112,6 +118,13 @@ export async function upsertPackage(formData: FormData): Promise<ActionResult> {
         .split("\n")
         .map((line) => line.trim())
         .filter(Boolean),
+      title_en: String(formData.get("title_en") ?? "").trim() || null,
+      description_en: String(formData.get("description_en") ?? "").trim() || null,
+      duration_en: String(formData.get("duration_en") ?? "").trim() || null,
+      features_en: String(formData.get("features_en") ?? "")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean),
       is_featured: formData.get("is_featured") === "on",
       is_active: formData.get("is_active") === "on",
       sort_order: Number(formData.get("sort_order") ?? 0),
@@ -126,7 +139,9 @@ export async function upsertPackage(formData: FormData): Promise<ActionResult> {
       : supabase.from("packages").insert(payload);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) {
+      return { ok: false, error: missingTableMessage(error, "supabase/migration-content.sql") };
+    }
 
     revalidatePath("/");
     revalidatePath("/admin/packages");
@@ -260,6 +275,31 @@ export async function updatePortfolioOrder(id: string, direction: "up" | "down")
   }
 }
 
+export async function updatePortfolioItem(formData: FormData): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const id = String(formData.get("id") ?? "");
+    if (!id) return { ok: false, error: "Falta el identificador." };
+
+    const { error } = await supabase
+      .from("portfolio")
+      .update({
+        title: String(formData.get("title") ?? "").trim(),
+        category: String(formData.get("category") ?? "photography"),
+        alt: String(formData.get("title") ?? "").trim() || null,
+        is_published: formData.get("is_published") === "on",
+      })
+      .eq("id", id);
+
+    if (error) return { ok: false, error: error.message };
+    revalidatePath("/");
+    revalidatePath("/admin/portfolio");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al guardar." };
+  }
+}
+
 export async function updateInquiryStatus(id: string, status: "pending" | "attended"): Promise<ActionResult> {
   try {
     const supabase = await requireUser();
@@ -285,12 +325,16 @@ export async function updateSiteSettings(formData: FormData): Promise<ActionResu
       phone_display: String(formData.get("phone_display") ?? "").trim(),
       email: String(formData.get("email") ?? "").trim(),
       address: String(formData.get("address") ?? "").trim(),
+      hours: String(formData.get("hours") ?? "").trim(),
+      announcement_es: String(formData.get("announcement_es") ?? "").trim(),
+      announcement_en: String(formData.get("announcement_en") ?? "").trim(),
+      announcement_enabled: formData.get("announcement_enabled") === "on",
       updated_at: new Date().toISOString(),
     };
 
     const { error } = await supabase.from("site_settings").upsert(payload, { onConflict: "id" });
     if (error) {
-      return { ok: false, error: missingTableMessage(error, "supabase/migration-site.sql") };
+      return { ok: false, error: missingTableMessage(error, "supabase/migration-content.sql") };
     }
 
     revalidatePath("/");
@@ -589,5 +633,53 @@ export async function updateInstagramStripOrder(
     return { ok: true };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Error al reordenar." };
+  }
+}
+
+export async function upsertTestimonial(formData: FormData): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const id = String(formData.get("id") ?? "");
+    const payload = {
+      client_name: String(formData.get("client_name") ?? "").trim(),
+      role: String(formData.get("role") ?? "").trim(),
+      quote: String(formData.get("quote") ?? "").trim(),
+      role_en: String(formData.get("role_en") ?? "").trim() || null,
+      quote_en: String(formData.get("quote_en") ?? "").trim() || null,
+      rating: Math.min(5, Math.max(1, Number(formData.get("rating") ?? 5))),
+      is_published: formData.get("is_published") === "on",
+    };
+
+    if (!payload.client_name || !payload.quote) {
+      return { ok: false, error: "Nombre y testimonio son obligatorios." };
+    }
+
+    const query = id
+      ? supabase.from("testimonials").update(payload).eq("id", id)
+      : supabase.from("testimonials").insert(payload);
+
+    const { error } = await query;
+    if (error) {
+      return { ok: false, error: missingTableMessage(error, "supabase/migration-content.sql") };
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/testimonials");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al guardar." };
+  }
+}
+
+export async function deleteTestimonial(id: string): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { error } = await supabase.from("testimonials").delete().eq("id", id);
+    if (error) return { ok: false, error: error.message };
+    revalidatePath("/");
+    revalidatePath("/admin/testimonials");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error al eliminar." };
   }
 }

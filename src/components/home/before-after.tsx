@@ -9,6 +9,7 @@ import type { BeforeAfterPair } from "@/lib/types";
 
 export function BeforeAfter({ pairs }: { pairs: BeforeAfterPair[] }) {
   const { t } = useI18n();
+  if (!pairs.length) return null;
 
   return (
     <section id="antes-despues" className="bg-cream px-6 py-20 sm:py-28">

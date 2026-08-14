@@ -12,6 +12,10 @@ export type ServicePackage = {
   description: string;
   features: string[];
   duration: string;
+  title_en?: string;
+  description_en?: string;
+  features_en?: string[];
+  duration_en?: string;
   is_featured: boolean;
   is_active: boolean;
   sort_order: number;
@@ -46,7 +50,10 @@ export type Testimonial = {
   client_name: string;
   role: string;
   quote: string;
+  role_en?: string;
+  quote_en?: string;
   rating: number;
+  is_published?: boolean;
 };
 
 export type InquiryInput = {
@@ -56,6 +63,7 @@ export type InquiryInput = {
   event_date?: string;
   service_type?: string;
   message?: string;
+  website?: string;
 };
 
 export type ActionResult = {
@@ -71,6 +79,10 @@ export type SiteSettings = {
   phone_display: string;
   email: string;
   address: string;
+  hours: string;
+  announcement_es: string;
+  announcement_en: string;
+  announcement_enabled: boolean;
 };
 
 export type HeroSlide = {

@@ -50,3 +50,21 @@ export const PORTFOLIO_FILTER_IDS = [
   "photography",
   "hair",
 ] as const;
+
+export const BOOKING_SERVICE_IDS = [
+  "bridal_combo",
+  "bridal_makeup",
+  "bridal_trial",
+  "social_makeup",
+  "bridal_hair",
+  "social_hair",
+  "photo_session",
+  "wedding_coverage",
+  "other",
+] as const;
+
+export const VIBES_DISTRICT = {
+  name: "Vibes District",
+  url: "https://www.vibesdistrict.com",
+  logo: "/images/vibes-district.png",
+} as const;

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/admin/login-form";
 import { isSupabaseConfigured } from "@/lib/utils";
@@ -27,9 +28,9 @@ export default function LoginPage() {
           En este computador: <span className="text-ink">localhost:3000/admin/login</span>.
           Desde otro lugar, usa la URL pública del sitio + <span className="text-ink">/admin/login</span>.
         </p>
-        <a href="/" className="mt-6 block text-center text-sm text-muted hover:text-ink">
+        <Link href="/" className="mt-6 block text-center text-sm text-muted hover:text-ink">
           ← Volver al sitio
-        </a>
+        </Link>
       </div>
     </div>
   );

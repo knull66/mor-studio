@@ -53,13 +53,22 @@ export function PackagesSection({ packages }: { packages: ServicePackage[] }) {
         </p>
       ) : null}
 
+      {visible.length === 0 ? (
+        <p className="mx-auto mt-12 max-w-xl text-center text-sm text-muted">{t.packages.empty}</p>
+      ) : (
       <div className="mx-auto mt-12 grid max-w-7xl gap-6 md:grid-cols-2 xl:grid-cols-3">
         {visible.map((item, index) => {
           const copy = t.packageItems[item.id];
-          const title = copy?.title ?? item.title;
-          const duration = copy?.duration ?? item.duration;
-          const description = copy?.description ?? item.description;
-          const features = copy?.features ?? item.features;
+          const title =
+            copy?.title ?? (locale === "en" && item.title_en ? item.title_en : item.title);
+          const duration =
+            copy?.duration ?? (locale === "en" && item.duration_en ? item.duration_en : item.duration);
+          const description =
+            copy?.description ??
+            (locale === "en" && item.description_en ? item.description_en : item.description);
+          const features =
+            copy?.features ??
+            (locale === "en" && item.features_en?.length ? item.features_en : item.features);
           const priceLabel = formatPrice(item.price, locale);
 
           return (
@@ -98,6 +107,7 @@ export function PackagesSection({ packages }: { packages: ServicePackage[] }) {
           );
         })}
       </div>
+      )}
     </section>
   );
 }

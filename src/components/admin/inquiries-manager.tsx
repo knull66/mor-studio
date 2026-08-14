@@ -3,11 +3,20 @@
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updateInquiryStatus } from "@/app/actions";
+import { dictionaries } from "@/lib/i18n/dictionaries";
 import type { Inquiry } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import { whatsappUrl } from "@/lib/whatsapp";
 
-export function InquiriesManager({ inquiries }: { inquiries: Inquiry[] }) {
+const SERVICE_LABELS = dictionaries.es.booking.services;
+
+export function InquiriesManager({
+  inquiries,
+  whatsapp,
+}: {
+  inquiries: Inquiry[];
+  whatsapp?: string;
+}) {
   const router = useRouter();
 
   return (
@@ -40,7 +49,11 @@ export function InquiriesManager({ inquiries }: { inquiries: Inquiry[] }) {
                     </p>
                   ) : null}
                 </td>
-                <td className="px-4 py-4">{item.service_type}</td>
+                <td className="px-4 py-4">
+                  {(item.service_type &&
+                    SERVICE_LABELS[item.service_type as keyof typeof SERVICE_LABELS]) ||
+                    item.service_type}
+                </td>
                 <td className="px-4 py-4">
                   {item.event_date ? formatDate(item.event_date) : "—"}
                   <p className="mt-1 text-xs text-muted">
@@ -61,7 +74,10 @@ export function InquiriesManager({ inquiries }: { inquiries: Inquiry[] }) {
                 <td className="px-4 py-4">
                   <div className="flex flex-col items-end gap-2">
                     <a
-                      href={whatsappUrl(`Hola ${item.client_name}, te escribimos de MOR Studio.`)}
+                      href={whatsappUrl(
+                        `Hola ${item.client_name}, te escribimos de MOR Studio.`,
+                        whatsapp,
+                      )}
                       target="_blank"
                       rel="noreferrer"
                       className="text-taupe-dark"

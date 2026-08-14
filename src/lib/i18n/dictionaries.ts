@@ -27,7 +27,7 @@ const es = {
     eyebrow: "Explorar",
     title: "Por categoría",
     description:
-      "Tres universos, un mismo criterio estético: piel verdadera, luz cuidada y un ritmo de estudio calmado.",
+      "Cuatro universos, un mismo criterio estético: piel verdadera, luz cuidada y un ritmo de estudio calmado.",
     exploreMore: "Explorar más",
     items: {
       photography: {
@@ -37,6 +37,10 @@ const es = {
       makeup: {
         title: "Maquillaje Social & Editorial",
         subtitle: "Social, quinceañeras y noche",
+      },
+      hair: {
+        title: "Peinados",
+        subtitle: "Novias, eventos y prueba de look",
       },
       brides: {
         title: "Especial Novias & Bodas",
@@ -49,7 +53,7 @@ const es = {
     title: "Elisabeth Morao",
     role: "Fundadora · Maquillista y fotógrafa",
     p1: "Elisabeth Morao es la artista y dueña de MOR Studio. Une maquillaje y fotografía en una sola mirada: prepara la piel para la cámara y dirige la luz para la piel, sin prisas ni looks que no sobreviven al flash.",
-    p2: "Desde San Antonio, Texas, acompaña a novias, familias y marcas que buscan un lujo cálido: menos filtro, más presencia. Cada sesión se siente íntima, editorial y hecha a tu medida.",
+    p2: "Desde San Antonio y el Hill Country, Texas, acompaña a novias, quinceañeras, familias y marcas que buscan un lujo cálido: menos filtro, más presencia. Cada sesión se siente íntima, editorial y hecha a tu medida.",
     cta: "Reservar con Elisabeth",
     photoAlt1: "Elisabeth Morao, artista y dueña de MOR Studio",
     photoAlt2: "Retrato de estudio de Elisabeth Morao",
@@ -70,6 +74,7 @@ const es = {
       "Precios orientativos en USD. Cada fecha se cotiza según locación, horario y número de personas. El 50% reserva tu día.",
     comboNote:
       "La combinación foto + maquillaje es nuestro mejor valor: un solo equipo, un solo criterio estético.",
+    empty: "Pronto publicaremos los paquetes de esta categoría.",
     featured: "Recomendado",
     from: "Precio desde · USD",
     cta: "Solicitar disponibilidad",
@@ -257,6 +262,7 @@ const es = {
       "Una selección de novias, beauty y retrato. Cada imagen se fotografió pensando en piel, gesto y luz — no en tendencias que caducan.",
     close: "Cerrar",
     expand: "Ver más grande",
+    empty: "Estamos curando la galería. Vuelve pronto.",
     filters: {
       all: "Todos",
       brides: "Novias",
@@ -334,17 +340,17 @@ const es = {
     sending: "Enviando…",
     error: "No se pudo enviar.",
     success: "Recibimos tu solicitud. También puedes continuar por WhatsApp.",
-    services: [
-      "Experiencia MOR (Foto + Maquillaje)",
-      "Maquillaje de novia",
-      "Prueba de maquillaje",
-      "Maquillaje social",
-      "Peinado de novia",
-      "Peinado social",
-      "Sesión fotográfica",
-      "Cobertura de boda",
-      "Otro",
-    ],
+    services: {
+      bridal_combo: "Experiencia MOR (Foto + Maquillaje)",
+      bridal_makeup: "Maquillaje de novia",
+      bridal_trial: "Prueba de maquillaje",
+      social_makeup: "Maquillaje social",
+      bridal_hair: "Peinado de novia",
+      social_hair: "Peinado social",
+      photo_session: "Sesión fotográfica",
+      wedding_coverage: "Cobertura de boda",
+      other: "Otro",
+    },
   },
   info: {
     questions: "¿Tienes preguntas?",
@@ -355,13 +361,13 @@ const es = {
   instagram: "Síguenos",
   footer: {
     blurb:
-      "Estudio de fotografía y maquillaje en San Antonio, Texas, dirigido por Elisabeth Morao. Belleza que se siente natural y se ve de revista.",
-    join: "Únete a la lista",
-    dates: "Fechas y lanzamientos",
-    emailPlaceholder: "Tu correo",
+      "Estudio de fotografía, maquillaje y peinados en San Antonio y el Hill Country, Texas, dirigido por Elisabeth Morao. Belleza que se siente natural y se ve de revista.",
+    join: "Agenda con Elisabeth",
+    dates: "Fechas 2026",
     book: "Reservar cita",
     rights: "Todos los derechos reservados.",
     admin: "Acceso Administrativo",
+    developedBy: "Sitio desarrollado por",
     links: {
       home: "Inicio",
       about: "Elisabeth",
@@ -390,8 +396,9 @@ const es = {
     back: "Volver al inicio",
   },
   meta: {
+    title: "MOR Studio · Fotografía, maquillaje y peinados",
     description:
-      "MOR Studio en San Antonio, Texas. Fotografía y maquillaje de Elisabeth Morao para novias, bodas, eventos y retrato editorial.",
+      "MOR Studio en San Antonio y el Hill Country, Texas. Fotografía, maquillaje y peinados de Elisabeth Morao para novias, bodas, quinceañeras y retrato editorial.",
   },
 };
 
@@ -422,7 +429,7 @@ const en: typeof es = {
     eyebrow: "Explore",
     title: "By category",
     description:
-      "Three worlds, one aesthetic: true skin, considered light, and an unhurried studio rhythm.",
+      "Four worlds, one aesthetic: true skin, considered light, and an unhurried studio rhythm.",
     exploreMore: "Explore more",
     items: {
       photography: {
@@ -432,6 +439,10 @@ const en: typeof es = {
       makeup: {
         title: "Social & Editorial Makeup",
         subtitle: "Events, quinceañeras & evening",
+      },
+      hair: {
+        title: "Hair styling",
+        subtitle: "Brides, events, and trials",
       },
       brides: {
         title: "Brides & Weddings",
@@ -444,7 +455,7 @@ const en: typeof es = {
     title: "Elisabeth Morao",
     role: "Founder · Makeup artist & photographer",
     p1: "Elisabeth Morao is the artist and owner of MOR Studio. She brings makeup and photography into a single point of view: skin prepared for the camera, light directed for the skin — no rush, no looks that disappear under flash.",
-    p2: "From San Antonio, Texas, she works with brides, families, and brands who want warm luxury: less filter, more presence. Every session feels intimate, editorial, and made for you.",
+    p2: "From San Antonio and the Texas Hill Country, she works with brides, quinceañeras, families, and brands who want warm luxury: less filter, more presence. Every session feels intimate, editorial, and made for you.",
     cta: "Book with Elisabeth",
     photoAlt1: "Elisabeth Morao, artist and owner of MOR Studio",
     photoAlt2: "Studio portrait of Elisabeth Morao",
@@ -465,6 +476,7 @@ const en: typeof es = {
       "Starting prices in USD. Each date is quoted by location, timing, and party size. A 50% deposit holds your day.",
     comboNote:
       "Photo + makeup together is our best value: one team, one aesthetic.",
+    empty: "Packages for this category will be published soon.",
     featured: "Featured",
     from: "Starting at · USD",
     cta: "Request availability",
@@ -649,6 +661,7 @@ const en: typeof es = {
       "A selection of brides, beauty, and portrait work. Every frame was made for skin, gesture, and light — not passing trends.",
     close: "Close",
     expand: "View larger",
+    empty: "We’re curating the gallery. Check back soon.",
     filters: {
       all: "All",
       brides: "Brides",
@@ -726,17 +739,17 @@ const en: typeof es = {
     sending: "Sending…",
     error: "We couldn’t send that.",
     success: "We received your request. You can also continue on WhatsApp.",
-    services: [
-      "MOR Experience (Photo + Makeup)",
-      "Bridal makeup",
-      "Makeup trial",
-      "Social makeup",
-      "Bridal hair",
-      "Event hair",
-      "Photo session",
-      "Wedding coverage",
-      "Other",
-    ],
+    services: {
+      bridal_combo: "MOR Experience (Photo + Makeup)",
+      bridal_makeup: "Bridal makeup",
+      bridal_trial: "Makeup trial",
+      social_makeup: "Social makeup",
+      bridal_hair: "Bridal hair",
+      social_hair: "Event hair",
+      photo_session: "Photo session",
+      wedding_coverage: "Wedding coverage",
+      other: "Other",
+    },
   },
   info: {
     questions: "Have questions?",
@@ -747,13 +760,13 @@ const en: typeof es = {
   instagram: "Follow us",
   footer: {
     blurb:
-      "Photography and makeup studio in San Antonio, Texas, led by Elisabeth Morao. Beauty that feels natural and looks like an editorial.",
-    join: "Join the list",
-    dates: "Dates and launches",
-    emailPlaceholder: "Your email",
+      "Photography, makeup, and hair studio in San Antonio and the Texas Hill Country, led by Elisabeth Morao. Beauty that feels natural and looks like an editorial.",
+    join: "Book with Elisabeth",
+    dates: "2026 dates",
     book: "Book an appointment",
     rights: "All rights reserved.",
     admin: "Admin access",
+    developedBy: "Site developed by",
     links: {
       home: "Home",
       about: "Elisabeth",
@@ -782,8 +795,9 @@ const en: typeof es = {
     back: "Back to home",
   },
   meta: {
+    title: "MOR Studio · Photography, makeup & hair",
     description:
-      "MOR Studio in San Antonio, Texas. Photography and makeup by Elisabeth Morao for brides, weddings, events, and editorial portrait.",
+      "MOR Studio in San Antonio and the Texas Hill Country. Photography, makeup, and hair by Elisabeth Morao for brides, weddings, quinceañeras, and editorial portrait.",
   },
 };
 

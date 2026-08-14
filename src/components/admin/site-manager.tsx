@@ -137,6 +137,41 @@ export function SiteManager({
               className="mt-2 w-full border border-sand-deep bg-white px-3 py-2 text-sm outline-none"
             />
           </label>
+          <label className="text-xs uppercase tracking-[0.16em] text-muted md:col-span-2">
+            Horario visible
+            <input
+              name="hours"
+              defaultValue={settings.hours}
+              placeholder="Mar — Sáb · 10:00 a.m. – 7:00 p.m."
+              className="mt-2 w-full border border-sand-deep bg-white px-3 py-2 text-sm outline-none"
+            />
+          </label>
+          <label className="flex items-center gap-2 text-sm md:col-span-2">
+            <input
+              type="checkbox"
+              name="announcement_enabled"
+              defaultChecked={settings.announcement_enabled}
+            />
+            Mostrar barra de anuncio
+          </label>
+          <label className="text-xs uppercase tracking-[0.16em] text-muted">
+            Anuncio (español)
+            <input
+              name="announcement_es"
+              defaultValue={settings.announcement_es}
+              placeholder="Promo o aviso en la barra superior"
+              className="mt-2 w-full border border-sand-deep bg-white px-3 py-2 text-sm outline-none"
+            />
+          </label>
+          <label className="text-xs uppercase tracking-[0.16em] text-muted">
+            Anuncio (inglés)
+            <input
+              name="announcement_en"
+              defaultValue={settings.announcement_en}
+              placeholder="Promo or notice in the top bar"
+              className="mt-2 w-full border border-sand-deep bg-white px-3 py-2 text-sm outline-none"
+            />
+          </label>
           <button type="submit" disabled={saving} className="solid-btn md:col-span-2">
             {saving ? "Guardando…" : "Guardar redes y contacto"}
           </button>
@@ -146,7 +181,7 @@ export function SiteManager({
       <section>
         <h2 className="font-serif text-2xl">Slider de inicio</h2>
         <p className="mt-1 mb-6 text-sm text-muted">
-          Fotos grandes del carrusel principal. Si no subes ninguna, se muestran las de demostración.
+          Fotos grandes del carrusel principal. Si no subes ninguna, el inicio queda con el texto sobre fondo oscuro. El pie de foto aparece como etiqueta sobre la imagen.
         </p>
         <form
           onSubmit={onUploadSlide}
@@ -247,8 +282,7 @@ export function SiteManager({
       <section>
         <h2 className="font-serif text-2xl">Antes y después</h2>
         <p className="mt-1 mb-6 text-sm text-muted">
-          Pares de fotos para el comparador de la web. Si no subes ninguno, se muestra el ejemplo de
-          demostración.
+          Pares de fotos para el comparador de la web. Si no subes ninguno, la sección no se muestra.
         </p>
         <form
           onSubmit={async (event) => {

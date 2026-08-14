@@ -10,6 +10,10 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   phone_display: SITE.phoneDisplay,
   email: SITE.email,
   address: SITE.address,
+  hours: "Mar — Sáb · 10:00 a.m. – 7:00 p.m.",
+  announcement_es: "",
+  announcement_en: "",
+  announcement_enabled: false,
 };
 
 export const DEFAULT_HERO_SLIDES: HeroSlide[] = HERO_SLIDES.map((slide, index) => ({

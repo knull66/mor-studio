@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import {
   createPortfolioItem,
   deletePortfolioItem,
+  updatePortfolioItem,
   updatePortfolioOrder,
 } from "@/app/actions";
 import type { PortfolioItem } from "@/lib/types";
@@ -24,6 +25,7 @@ export function PortfolioManager({ items }: { items: PortfolioItem[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [pending, setPending] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   async function upload(file: File, title: string, category: string) {
     const data = new FormData();
@@ -112,9 +114,19 @@ export function PortfolioManager({ items }: { items: PortfolioItem[] }) {
             <div className="flex items-center justify-between gap-2 p-3">
               <div>
                 <p className="text-sm font-medium">{item.title || "Sin título"}</p>
-                <p className="text-xs uppercase tracking-widest text-muted">{item.category}</p>
+                <p className="text-xs uppercase tracking-widest text-muted">
+                  {item.category}
+                  {item.is_published ? "" : " · Oculta"}
+                </p>
               </div>
               <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  className="px-1 text-xs"
+                  onClick={() => setEditingId(editingId === item.id ? null : item.id)}
+                >
+                  Editar
+                </button>
                 <button
                   type="button"
                   disabled={index === 0}
@@ -152,6 +164,48 @@ export function PortfolioManager({ items }: { items: PortfolioItem[] }) {
                 </button>
               </div>
             </div>
+            {editingId === item.id ? (
+              <form
+                className="grid gap-2 border-t border-sand-deep p-3"
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  const result = await updatePortfolioItem(new FormData(event.currentTarget));
+                  if (!result.ok) {
+                    toast.error(result.error);
+                    return;
+                  }
+                  toast.success("Foto actualizada.");
+                  setEditingId(null);
+                  router.refresh();
+                }}
+              >
+                <input type="hidden" name="id" value={item.id} />
+                <input
+                  name="title"
+                  defaultValue={item.title}
+                  placeholder="Título"
+                  className="border border-sand-deep bg-white px-2 py-1.5 text-sm"
+                />
+                <select
+                  name="category"
+                  defaultValue={item.category}
+                  className="border border-sand-deep bg-white px-2 py-1.5 text-sm"
+                >
+                  {CATEGORIES.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+                <label className="flex items-center gap-2 text-xs">
+                  <input type="checkbox" name="is_published" defaultChecked={item.is_published} />
+                  Visible en la web
+                </label>
+                <button type="submit" className="solid-btn !py-2">
+                  Guardar
+                </button>
+              </form>
+            ) : null}
           </article>
         ))}
       </div>

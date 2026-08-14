@@ -12,6 +12,11 @@ import type {
   Testimonial,
 } from "@/lib/types";
 
+function isMissingRelation(error: { message?: string; code?: string } | null) {
+  if (!error) return false;
+  return error.code === "PGRST205" || Boolean(error.message?.includes("schema cache"));
+}
+
 function mapPackage(row: Record<string, unknown>): ServicePackage {
   return {
     id: String(row.id),
@@ -21,6 +26,10 @@ function mapPackage(row: Record<string, unknown>): ServicePackage {
     description: String(row.description ?? ""),
     features: Array.isArray(row.features) ? (row.features as string[]) : [],
     duration: String(row.duration ?? ""),
+    title_en: row.title_en ? String(row.title_en) : "",
+    description_en: row.description_en ? String(row.description_en) : "",
+    features_en: Array.isArray(row.features_en) ? (row.features_en as string[]) : [],
+    duration_en: row.duration_en ? String(row.duration_en) : "",
     is_featured: Boolean(row.is_featured),
     is_active: row.is_active !== false,
     sort_order: Number(row.sort_order ?? 0),
@@ -60,8 +69,8 @@ export async function getPackages(): Promise<ServicePackage[]> {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  if (error || !data?.length) return SEED_PACKAGES.filter((item) => item.is_active);
-  return data.map(mapPackage);
+  if (error) return isMissingRelation(error) ? SEED_PACKAGES.filter((item) => item.is_active) : [];
+  return (data ?? []).map(mapPackage);
 }
 
 export async function getAllPackages(): Promise<ServicePackage[]> {
@@ -87,8 +96,8 @@ export async function getPortfolio(): Promise<PortfolioItem[]> {
     .eq("is_published", true)
     .order("sort_order", { ascending: true });
 
-  if (error || !data?.length) return SEED_PORTFOLIO;
-  return data.map(mapPortfolio);
+  if (error) return isMissingRelation(error) ? SEED_PORTFOLIO : [];
+  return (data ?? []).map(mapPortfolio);
 }
 
 export async function getAllPortfolio(): Promise<PortfolioItem[]> {
@@ -114,14 +123,34 @@ export async function getTestimonials(): Promise<Testimonial[]> {
     .eq("is_published", true)
     .order("created_at", { ascending: false });
 
-  if (error || !data?.length) return SEED_TESTIMONIALS;
-  return data.map((row) => ({
+  if (error) return isMissingRelation(error) ? SEED_TESTIMONIALS : [];
+  return (data ?? []).map(mapTestimonial);
+}
+
+export async function getAllTestimonials(): Promise<Testimonial[]> {
+  const supabase = await createClient();
+  if (!supabase) return SEED_TESTIMONIALS;
+
+  const { data, error } = await supabase
+    .from("testimonials")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) return [];
+  return (data ?? []).map(mapTestimonial);
+}
+
+function mapTestimonial(row: Record<string, unknown>): Testimonial {
+  return {
     id: String(row.id),
     client_name: String(row.client_name),
     role: String(row.role ?? ""),
     quote: String(row.quote),
+    role_en: row.role_en ? String(row.role_en) : "",
+    quote_en: row.quote_en ? String(row.quote_en) : "",
     rating: Number(row.rating ?? 5),
-  }));
+    is_published: row.is_published !== false,
+  };
 }
 
 export async function getInquiries(): Promise<Inquiry[]> {
@@ -155,7 +184,7 @@ export async function getAdminStats() {
   ]);
 
   return {
-    packages: packages.length,
+    packages: packages.filter((item) => item.is_active).length,
     portfolio: portfolio.length,
     pending: inquiries.filter((item) => item.status === "pending").length,
     attended: inquiries.filter((item) => item.status === "attended").length,
@@ -182,6 +211,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     phone_display: String(data.phone_display ?? DEFAULT_SETTINGS.phone_display),
     email: String(data.email ?? DEFAULT_SETTINGS.email),
     address: String(data.address ?? DEFAULT_SETTINGS.address),
+    hours: String(data.hours ?? DEFAULT_SETTINGS.hours),
+    announcement_es: String(data.announcement_es ?? ""),
+    announcement_en: String(data.announcement_en ?? ""),
+    announcement_enabled: data.announcement_enabled === true,
   };
 }
 
@@ -195,8 +228,8 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
     .eq("is_published", true)
     .order("sort_order", { ascending: true });
 
-  if (error || !data?.length) return DEFAULT_HERO_SLIDES;
-  return data.map(mapHero);
+  if (error) return isMissingRelation(error) ? DEFAULT_HERO_SLIDES : [];
+  return (data ?? []).map(mapHero);
 }
 
 export async function getAllHeroSlides(): Promise<HeroSlide[]> {
@@ -246,8 +279,8 @@ export async function getBeforeAfterPairs(): Promise<BeforeAfterPair[]> {
     .eq("is_published", true)
     .order("sort_order", { ascending: true });
 
-  if (error || !data?.length) return DEFAULT_BEFORE_AFTER;
-  return data.map(mapBeforeAfter);
+  if (error) return isMissingRelation(error) ? DEFAULT_BEFORE_AFTER : [];
+  return (data ?? []).map(mapBeforeAfter);
 }
 
 export async function getAllBeforeAfterPairs(): Promise<BeforeAfterPair[]> {
@@ -283,8 +316,8 @@ export async function getInstagramStrip(): Promise<InstagramStripItem[]> {
     .eq("is_published", true)
     .order("sort_order", { ascending: true });
 
-  if (error || !data?.length) return DEFAULT_INSTAGRAM_STRIP;
-  return data.map(mapInstagramStrip);
+  if (error) return isMissingRelation(error) ? DEFAULT_INSTAGRAM_STRIP : [];
+  return (data ?? []).map(mapInstagramStrip);
 }
 
 export async function getAllInstagramStrip(): Promise<InstagramStripItem[]> {

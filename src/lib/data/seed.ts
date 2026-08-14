@@ -437,6 +437,11 @@ export const CATEGORIES = [
     image: unsplash("photo-1522335789203-aabd1fc54bc9", 1200),
   },
   {
+    id: "hair" as const,
+    href: "#paquetes",
+    image: unsplash("photo-1562322140-8baeececf3df", 1200),
+  },
+  {
     id: "brides" as const,
     href: "#paquetes",
     image: unsplash("photo-1606800052052-a08af7148866", 1200),

@@ -92,3 +92,8 @@ body {
   color: var(--color-cream);
   border-color: var(--color-charcoal);
 }
+
+:focus-visible {
+  outline: 2px solid var(--color-taupe-dark);
+  outline-offset: 3px;
+}

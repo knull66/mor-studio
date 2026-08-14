@@ -18,7 +18,7 @@ export function Categories() {
           description={t.categories.description}
         />
       </Reveal>
-      <div className="mx-auto mt-14 grid max-w-7xl gap-6 md:grid-cols-3">
+      <div className="mx-auto mt-14 grid max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {CATEGORIES.map((category, index) => {
           const copy = t.categories.items[category.id];
           return (

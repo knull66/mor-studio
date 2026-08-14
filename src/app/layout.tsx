@@ -24,52 +24,57 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE.url),
-  title: {
-    default: `${SITE.name} · ${SITE.tagline}`,
-    template: `%s · ${SITE.name}`,
-  },
-  description:
-    "MOR Studio in San Antonio, Texas. Photography and makeup by Elisabeth Morao for brides, weddings, events, and editorial portrait.",
-  keywords: [
-    "bridal makeup San Antonio",
-    "wedding photographer San Antonio",
-    "Elisabeth Morao",
-    "MOR Studio",
-    "maquillaje de novia San Antonio",
-    "fotografía de bodas Texas",
-  ],
-  icons: {
-    icon: [{ url: "/icon.png", type: "image/png" }],
-    apple: [{ url: "/apple-icon.png", type: "image/png" }],
-  },
-  openGraph: {
-    title: `${SITE.name} · ${SITE.tagline}`,
-    description:
-      "Photography and makeup studio in San Antonio, Texas, led by Elisabeth Morao.",
-    locale: "es_US",
-    alternateLocale: ["en_US"],
-    type: "website",
-    url: SITE.url,
-    siteName: SITE.name,
-    images: [
-      {
-        url: "/images/og-mor.png?v=20260813",
-        width: 1200,
-        height: 630,
-        alt: "MOR Photography",
-      },
+export async function generateMetadata(): Promise<Metadata> {
+  const cookieStore = await cookies();
+  const rawLocale = cookieStore.get(LOCALE_COOKIE)?.value;
+  const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
+  const t = getDictionary(locale);
+
+  return {
+    metadataBase: new URL(SITE.url),
+    title: {
+      default: t.meta.title,
+      template: `%s · ${SITE.name}`,
+    },
+    description: t.meta.description,
+    keywords: [
+      "bridal makeup San Antonio",
+      "wedding photographer San Antonio",
+      "Elisabeth Morao",
+      "MOR Studio",
+      "maquillaje de novia San Antonio",
+      "fotografía de bodas Texas",
+      "peinado de novia San Antonio",
     ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${SITE.name} · ${SITE.tagline}`,
-    description:
-      "Photography and makeup studio in San Antonio, Texas, led by Elisabeth Morao.",
-    images: ["/images/og-mor.png?v=20260813"],
-  },
-};
+    icons: {
+      icon: [{ url: "/icon.png", type: "image/png" }],
+      apple: [{ url: "/apple-icon.png", type: "image/png" }],
+    },
+    openGraph: {
+      title: t.meta.title,
+      description: t.meta.description,
+      locale: locale === "es" ? "es_US" : "en_US",
+      alternateLocale: locale === "es" ? ["en_US"] : ["es_US"],
+      type: "website",
+      url: SITE.url,
+      siteName: SITE.name,
+      images: [
+        {
+          url: "/images/og-mor.png?v=20260813",
+          width: 1200,
+          height: 630,
+          alt: "MOR Photography",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.meta.title,
+      description: t.meta.description,
+      images: ["/images/og-mor.png?v=20260813"],
+    },
+  };
+}
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const cookieStore = await cookies();

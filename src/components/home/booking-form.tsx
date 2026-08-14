@@ -7,6 +7,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { submitInquiry } from "@/app/actions";
 import { useI18n } from "@/lib/i18n/language-provider";
 import { useSite } from "@/lib/site-provider";
+import { BOOKING_SERVICE_IDS } from "@/lib/constants";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 export function BookingForm() {
@@ -27,6 +28,7 @@ export function BookingForm() {
       event_date: String(data.get("event_date") ?? ""),
       service_type: String(data.get("service_type") ?? ""),
       message: String(data.get("message") ?? ""),
+      website: String(data.get("website") ?? ""),
     };
 
     const result = await submitInquiry(payload);
@@ -37,12 +39,16 @@ export function BookingForm() {
       return;
     }
 
+    const serviceLabel =
+      t.booking.services[payload.service_type as keyof typeof t.booking.services] ??
+      payload.service_type;
+
     toast.success(t.booking.success);
     window.open(
       whatsappUrl(
         t.whatsapp.booking(
           payload.client_name,
-          payload.service_type,
+          serviceLabel,
           payload.event_date,
           payload.message,
         ),
@@ -66,7 +72,7 @@ export function BookingForm() {
       <Reveal delay={0.08}>
         <form
           onSubmit={onSubmit}
-          className="mx-auto mt-12 grid max-w-3xl gap-4 bg-cream p-6 sm:p-10 md:grid-cols-2"
+          className="relative mx-auto mt-12 grid max-w-3xl gap-4 bg-cream p-6 sm:p-10 md:grid-cols-2"
         >
           <label className="block text-xs uppercase tracking-[0.16em] text-muted">
             {t.booking.name}
@@ -106,14 +112,24 @@ export function BookingForm() {
             <select
               key={locale}
               name="service_type"
-              defaultValue={t.booking.services[0]}
+              defaultValue={BOOKING_SERVICE_IDS[0]}
               className="mt-2 w-full border border-sand-deep bg-white px-4 py-3 text-sm text-ink outline-none focus:border-taupe"
             >
-              {t.booking.services.map((option) => (
-                <option key={option}>{option}</option>
+              {BOOKING_SERVICE_IDS.map((id) => (
+                <option key={id} value={id}>
+                  {t.booking.services[id]}
+                </option>
               ))}
             </select>
           </label>
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="absolute -left-[9999px] h-0 w-0 opacity-0"
+          />
           <label className="block text-xs uppercase tracking-[0.16em] text-muted md:col-span-2">
             {t.booking.message}
             <textarea

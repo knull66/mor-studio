@@ -11,6 +11,10 @@ create table if not exists public.packages (
   description text,
   features text[] default '{}',
   duration varchar,
+  title_en text,
+  description_en text,
+  features_en text[],
+  duration_en text,
   is_featured boolean default false,
   is_active boolean default true,
   sort_order int default 0,
@@ -45,6 +49,8 @@ create table if not exists public.testimonials (
   client_name varchar not null,
   role varchar,
   quote text not null,
+  quote_en text,
+  role_en text,
   rating int default 5,
   is_published boolean default true,
   created_at timestamptz default timezone('utc'::text, now())
@@ -179,6 +185,10 @@ create table if not exists public.site_settings (
   phone_display text,
   email text,
   address text,
+  hours text,
+  announcement_es text,
+  announcement_en text,
+  announcement_enabled boolean default false,
   updated_at timestamptz default timezone('utc'::text, now())
 );
 
@@ -206,7 +216,7 @@ create policy "hero_public_read" on public.hero_slides for select using (is_publ
 create policy "hero_admin_all" on public.hero_slides for all to authenticated using (true) with check (true);
 
 insert into public.site_settings (
-  id, instagram, facebook, tiktok, whatsapp, phone_display, email, address
+  id, instagram, facebook, tiktok, whatsapp, phone_display, email, address, hours, announcement_enabled
 ) values (
   'main',
   'https://www.instagram.com/Moor_Beauty_photography/',
@@ -215,9 +225,22 @@ insert into public.site_settings (
   '12105485300',
   '+1 (210) 548-5300',
   'booking@morstudio.vip',
-  'San Antonio, Texas'
+  'San Antonio, Texas',
+  'Mar — Sáb · 10:00 a.m. – 7:00 p.m.',
+  false
 )
 on conflict (id) do nothing;
+
+alter table public.site_settings add column if not exists hours text;
+alter table public.site_settings add column if not exists announcement_es text;
+alter table public.site_settings add column if not exists announcement_en text;
+alter table public.site_settings add column if not exists announcement_enabled boolean default false;
+alter table public.packages add column if not exists title_en text;
+alter table public.packages add column if not exists description_en text;
+alter table public.packages add column if not exists features_en text[];
+alter table public.packages add column if not exists duration_en text;
+alter table public.testimonials add column if not exists quote_en text;
+alter table public.testimonials add column if not exists role_en text;
 
 create table if not exists public.before_after_pairs (
   id uuid primary key default gen_random_uuid(),

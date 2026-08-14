@@ -24,7 +24,7 @@ export function InfoBar() {
     {
       icon: Clock,
       label: t.info.hoursLabel,
-      value: t.info.hours,
+      value: settings.hours || t.info.hours,
       href: "#reservar",
     },
   ];
