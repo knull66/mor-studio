@@ -5,10 +5,20 @@ import { toast } from "sonner";
 import { updateInquiryStatus } from "@/app/actions";
 import { dictionaries } from "@/lib/i18n/dictionaries";
 import type { Inquiry } from "@/lib/types";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatMoney } from "@/lib/utils";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 const SERVICE_LABELS = dictionaries.es.booking.services;
+
+function paymentLabel(item: Inquiry) {
+  if (item.payment_method === "stripe" && item.payment_status === "paid") {
+    const amount =
+      item.amount_cents != null ? ` · ${formatMoney(item.amount_cents / 100)}` : "";
+    return `Stripe pagado${amount}`;
+  }
+  if (item.payment_method === "stripe") return "Stripe pendiente";
+  return "WhatsApp";
+}
 
 export function InquiriesManager({
   inquiries,
@@ -23,14 +33,15 @@ export function InquiriesManager({
     <div className="overflow-x-auto border border-sand-deep bg-cream">
       {inquiries.length === 0 ? (
         <p className="p-8 text-sm text-muted">
-          Aún no hay solicitudes. Cuando alguien complete el formulario, aparecerán aquí.
+          Aún no hay solicitudes. Cuando alguien complete el formulario o pague un depósito, aparecerán aquí.
         </p>
       ) : (
-        <table className="w-full min-w-[800px] text-left text-sm">
+        <table className="w-full min-w-[920px] text-left text-sm">
           <thead className="bg-sand text-[0.68rem] uppercase tracking-[0.14em] text-muted">
             <tr>
               <th className="px-4 py-3">Cliente</th>
               <th className="px-4 py-3">Servicio</th>
+              <th className="px-4 py-3">Pago</th>
               <th className="px-4 py-3">Fecha evento</th>
               <th className="px-4 py-3">Estado</th>
               <th className="px-4 py-3" />
@@ -50,9 +61,21 @@ export function InquiriesManager({
                   ) : null}
                 </td>
                 <td className="px-4 py-4">
-                  {(item.service_type &&
-                    SERVICE_LABELS[item.service_type as keyof typeof SERVICE_LABELS]) ||
+                  {item.package_title ||
+                    (item.service_type &&
+                      SERVICE_LABELS[item.service_type as keyof typeof SERVICE_LABELS]) ||
                     item.service_type}
+                </td>
+                <td className="px-4 py-4">
+                  <span
+                    className={`px-2 py-1 text-[0.65rem] uppercase tracking-widest ${
+                      item.payment_status === "paid"
+                        ? "bg-charcoal text-cream"
+                        : "bg-sand-deep text-ink"
+                    }`}
+                  >
+                    {paymentLabel(item)}
+                  </span>
                 </td>
                 <td className="px-4 py-4">
                   {item.event_date ? formatDate(item.event_date) : "—"}

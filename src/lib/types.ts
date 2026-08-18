@@ -4,6 +4,10 @@ export type PortfolioCategory = "brides" | "makeup" | "photography" | "hair";
 
 export type InquiryStatus = "pending" | "attended";
 
+export type PaymentMethod = "whatsapp" | "stripe";
+
+export type PaymentStatus = "unpaid" | "paid" | "refunded";
+
 export type ServicePackage = {
   id: string;
   title: string;
@@ -42,6 +46,12 @@ export type Inquiry = {
   service_type: string | null;
   message: string | null;
   status: InquiryStatus;
+  payment_method: PaymentMethod;
+  payment_status: PaymentStatus;
+  stripe_checkout_session_id: string | null;
+  package_id: string | null;
+  package_title: string | null;
+  amount_cents: number | null;
   created_at: string;
 };
 
@@ -64,6 +74,8 @@ export type InquiryInput = {
   service_type?: string;
   message?: string;
   website?: string;
+  package_id?: string;
+  payment_method?: PaymentMethod;
 };
 
 export type ActionResult = {

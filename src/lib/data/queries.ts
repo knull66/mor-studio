@@ -74,6 +74,11 @@ export async function getPackages(): Promise<ServicePackage[]> {
   return (data ?? []).map(mapPackage);
 }
 
+export async function getPackageById(id: string): Promise<ServicePackage | null> {
+  const packages = await getPackages();
+  return packages.find((item) => item.id === id) ?? null;
+}
+
 export async function getAllPackages(): Promise<ServicePackage[]> {
   const supabase = await createClient();
   if (!supabase) return SEED_PACKAGES;
@@ -173,6 +178,17 @@ export async function getInquiries(): Promise<Inquiry[]> {
     service_type: row.service_type ? String(row.service_type) : null,
     message: row.message ? String(row.message) : null,
     status: (row.status as Inquiry["status"]) ?? "pending",
+    payment_method: row.payment_method === "stripe" ? "stripe" : "whatsapp",
+    payment_status:
+      row.payment_status === "paid" || row.payment_status === "refunded"
+        ? row.payment_status
+        : "unpaid",
+    stripe_checkout_session_id: row.stripe_checkout_session_id
+      ? String(row.stripe_checkout_session_id)
+      : null,
+    package_id: row.package_id ? String(row.package_id) : null,
+    package_title: row.package_title ? String(row.package_title) : null,
+    amount_cents: row.amount_cents != null ? Number(row.amount_cents) : null,
     created_at: String(row.created_at),
   }));
 }

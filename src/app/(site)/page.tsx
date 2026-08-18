@@ -10,8 +10,15 @@ import { PackagesSection } from "@/components/home/packages-section";
 import { PortfolioGallery } from "@/components/home/portfolio-gallery";
 import { Testimonials } from "@/components/home/testimonials";
 import { getBeforeAfterPairs, getInstagramStrip, getPackages, getPortfolio, getTeamMembers, getTestimonials } from "@/lib/data/queries";
+import { isStripeConfigured } from "@/lib/stripe";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ paquete?: string; pago?: string }>;
+}) {
+  const params = await searchParams;
+  const stripeEnabled = isStripeConfigured();
   const [packages, portfolio, testimonials, beforeAfter, instagramStrip, team] = await Promise.all([
     getPackages(),
     getPortfolio(),
@@ -27,11 +34,16 @@ export default async function HomePage() {
       <Categories />
       <About members={team} />
       <BeforeAfter pairs={beforeAfter} />
-      <PackagesSection packages={packages} />
+      <PackagesSection packages={packages} stripeEnabled={stripeEnabled} />
       <PortfolioGallery items={portfolio} />
       <Testimonials items={testimonials} />
       <Faq />
-      <BookingForm />
+      <BookingForm
+        packages={packages}
+        stripeEnabled={stripeEnabled}
+        initialPackageId={params.paquete}
+        initialMethod={params.pago === "stripe" ? "stripe" : "whatsapp"}
+      />
       <InfoBar />
       <InstagramStrip items={instagramStrip} />
     </>

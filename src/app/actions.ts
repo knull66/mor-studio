@@ -2,7 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getPackageById } from "@/lib/data/queries";
+import { depositCents } from "@/lib/deposit";
+import { getStripe, isStripeConfigured, siteUrl } from "@/lib/stripe";
+import { localizedPackage } from "@/lib/packages";
+import { dictionaries } from "@/lib/i18n/dictionaries";
+import { isLocale } from "@/lib/i18n/config";
 import type { ActionResult, InquiryInput } from "@/lib/types";
+import { isSupabaseConfigured } from "@/lib/utils";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -63,7 +70,7 @@ export async function submitInquiry(input: InquiryInput): Promise<ActionResult> 
     };
   }
 
-  const { error } = await supabase.from("inquiries").insert({
+  const row = {
     client_name: name,
     email: input.email?.trim() || null,
     phone,
@@ -71,15 +78,117 @@ export async function submitInquiry(input: InquiryInput): Promise<ActionResult> 
     service_type: input.service_type || null,
     message: input.message?.trim() || null,
     status: "pending",
-  });
+    payment_method: "whatsapp",
+    payment_status: "unpaid",
+    package_id: input.package_id || null,
+  };
+
+  const { error } = await supabase.from("inquiries").insert(row);
 
   if (error) {
-    return { ok: false, error: "No pudimos guardar tu solicitud. Escríbenos por WhatsApp." };
+    const { error: fallbackError } = await supabase.from("inquiries").insert({
+      client_name: row.client_name,
+      email: row.email,
+      phone: row.phone,
+      event_date: row.event_date,
+      service_type: row.service_type,
+      message: row.message,
+      status: "pending",
+    });
+    if (fallbackError) {
+      return { ok: false, error: "No pudimos guardar tu solicitud. Escríbenos por WhatsApp." };
+    }
   }
 
   revalidatePath("/admin/inquiries");
   revalidatePath("/admin");
   return { ok: true };
+}
+
+export async function startStripeCheckout(
+  input: InquiryInput & { locale?: string },
+): Promise<ActionResult & { url?: string }> {
+  if (input.website?.trim()) return { ok: true };
+
+  if (!isStripeConfigured()) {
+    return { ok: false, error: "El pago con tarjeta no está activo. Escríbenos por WhatsApp." };
+  }
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "El formulario no está conectado. Escríbenos por WhatsApp." };
+  }
+
+  const name = input.client_name.trim();
+  const phone = input.phone.trim();
+  const email = input.email?.trim() ?? "";
+  const packageId = input.package_id?.trim() ?? "";
+
+  if (name.length < 2) return { ok: false, error: "Escribe tu nombre." };
+  if (phone.length < 8) return { ok: false, error: "Escribe un teléfono válido." };
+  if (!email.includes("@")) return { ok: false, error: "El correo es necesario para pagar el depósito." };
+  if (!packageId) return { ok: false, error: "Elige un paquete para calcular el depósito." };
+
+  const pkg = await getPackageById(packageId);
+  if (!pkg) return { ok: false, error: "Ese paquete ya no está disponible." };
+
+  const amount = depositCents(pkg.price);
+  if (amount < 50) return { ok: false, error: "El depósito mínimo no es válido." };
+
+  const stripe = getStripe();
+  if (!stripe) return { ok: false, error: "Stripe no está configurado." };
+
+  const locale = isLocale(input.locale) ? input.locale : "es";
+  const t = dictionaries[locale];
+  const { title } = localizedPackage(pkg, locale, t);
+  const origin = siteUrl();
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      submit_type: "pay",
+      locale,
+      customer_email: email,
+      phone_number_collection: { enabled: true },
+      success_url: `${origin}/reserva/exito?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/reserva/cancelado`,
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: "usd",
+            unit_amount: amount,
+            product_data: {
+              name: locale === "es" ? `Depósito 50% · ${title}` : `50% deposit · ${title}`,
+              description:
+                locale === "es"
+                  ? "El saldo se paga el día del servicio. Elisabeth confirma la fecha en 24 horas; si no hay disponibilidad, se reagenda o se reembolsa el depósito."
+                  : "The balance is due on the service day. Elisabeth confirms the date within 24 hours; if it is unavailable, we will reschedule or refund the deposit.",
+            },
+          },
+        },
+      ],
+      metadata: {
+        client_name: name.slice(0, 200),
+        phone: phone.slice(0, 40),
+        email: email.slice(0, 200),
+        event_date: (input.event_date ?? "").slice(0, 40),
+        service_type: (input.service_type ?? "").slice(0, 80),
+        message: (input.message ?? "").slice(0, 400),
+        package_id: pkg.id,
+        package_title: title.slice(0, 200),
+        amount_cents: String(amount),
+        locale,
+      },
+      payment_intent_data: {
+        description: `MOR Studio deposit · ${title}`.slice(0, 1000),
+      },
+    });
+
+    if (!session.url) return { ok: false, error: "No se pudo abrir Stripe. Inténtalo de nuevo." };
+    return { ok: true, url: session.url };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "No se pudo crear el pago.";
+    return { ok: false, error: message };
+  }
 }
 
 export async function signIn(formData: FormData): Promise<ActionResult> {

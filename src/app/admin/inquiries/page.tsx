@@ -19,7 +19,7 @@ export default async function AdminInquiriesPage() {
     <AdminShell email={user.email}>
       <h1 className="font-serif text-4xl">Solicitudes</h1>
       <p className="mt-2 mb-8 text-sm text-muted">
-        Contactos del formulario público. Márcalos como atendidos cuando respondas.
+        Contactos del formulario y depósitos de Stripe. Márcalos como atendidos cuando confirmes la fecha.
       </p>
       <InquiriesManager inquiries={inquiries} whatsapp={settings.whatsapp} />
     </AdminShell>

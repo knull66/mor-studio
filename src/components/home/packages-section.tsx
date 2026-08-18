@@ -9,10 +9,17 @@ import { useI18n } from "@/lib/i18n/language-provider";
 import { useSite } from "@/lib/site-provider";
 import { localizedPackage } from "@/lib/packages";
 import type { PackageCategory, ServicePackage } from "@/lib/types";
-import { formatPrice } from "@/lib/utils";
+import { formatMoney, formatPrice } from "@/lib/utils";
 import { whatsappUrl } from "@/lib/whatsapp";
+import { centsToUsd, depositCents } from "@/lib/deposit";
 
-export function PackagesSection({ packages }: { packages: ServicePackage[] }) {
+export function PackagesSection({
+  packages,
+  stripeEnabled,
+}: {
+  packages: ServicePackage[];
+  stripeEnabled: boolean;
+}) {
   const { t, locale } = useI18n();
   const { settings } = useSite();
   const [tab, setTab] = useState<PackageCategory>("bridal_combo");
@@ -89,10 +96,21 @@ export function PackagesSection({ packages }: { packages: ServicePackage[] }) {
                   href={whatsappUrl(t.whatsapp.package(title, priceLabel), settings.whatsapp)}
                   target="_blank"
                   rel="noreferrer"
-                  className="solid-btn mt-8 w-full"
+                  className={stripeEnabled ? "outlined-btn mt-8 w-full border-ink text-ink" : "solid-btn mt-8 w-full"}
                 >
                   {t.packages.cta}
                 </a>
+                {stripeEnabled ? (
+                  <a
+                    href={`/?paquete=${encodeURIComponent(item.id)}&pago=stripe#reservar`}
+                    className="solid-btn mt-3 w-full"
+                  >
+                    {t.packages.ctaStripe}
+                    <span className="ml-2 normal-case tracking-normal">
+                      · {formatMoney(centsToUsd(depositCents(item.price)), locale)}
+                    </span>
+                  </a>
+                ) : null}
               </article>
             </Reveal>
           );

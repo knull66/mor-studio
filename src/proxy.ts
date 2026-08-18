@@ -1,9 +1,35 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isSiteEnabled } from "@/lib/site-enabled";
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
   const { pathname } = request.nextUrl;
+
+  if (!isSiteEnabled()) {
+    if (
+      pathname.startsWith("/api/stripe/webhook") ||
+      pathname === "/robots.txt" ||
+      pathname === "/sitemap.xml"
+    ) {
+      return NextResponse.next({ request });
+    }
+    if (pathname === "/mantenimiento") {
+      return NextResponse.next({ request });
+    }
+    const maintenanceUrl = request.nextUrl.clone();
+    maintenanceUrl.pathname = "/mantenimiento";
+    maintenanceUrl.search = "";
+    return NextResponse.rewrite(maintenanceUrl, {
+      status: 503,
+      headers: { "Retry-After": "86400" },
+    });
+  }
+
+  if (pathname === "/mantenimiento") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  let supabaseResponse = NextResponse.next({ request });
   const isAdmin = pathname.startsWith("/admin");
   const isLogin = pathname.startsWith("/admin/login");
 
@@ -56,5 +82,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+  ],
 };

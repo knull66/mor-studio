@@ -14,6 +14,15 @@ export function formatPrice(value: number, locale: Locale = "es") {
   }).format(value);
 }
 
+export function formatMoney(value: number, locale: Locale = "es") {
+  return new Intl.NumberFormat(locale === "en" ? "en-US" : "es-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: value % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 export function formatDate(value: string | Date, locale: Locale = "es") {
   return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-US", {
     day: "numeric",
