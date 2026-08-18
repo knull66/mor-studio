@@ -1,11 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { isSiteEnabled } from "@/lib/site-enabled";
+
+function siteIsEnabled() {
+  // Leer process.env aquí: el bundler de Proxy solo inyecta vars usadas en este archivo.
+  const value = process.env.SITE_ENABLED?.trim().toLowerCase();
+  if (!value) return true;
+  return !["0", "false", "off", "no", "disabled"].includes(value);
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (!isSiteEnabled()) {
+  if (!siteIsEnabled()) {
     if (
       pathname.startsWith("/api/stripe/webhook") ||
       pathname === "/robots.txt" ||
@@ -19,10 +25,9 @@ export async function proxy(request: NextRequest) {
     const maintenanceUrl = request.nextUrl.clone();
     maintenanceUrl.pathname = "/mantenimiento";
     maintenanceUrl.search = "";
-    return NextResponse.rewrite(maintenanceUrl, {
-      status: 503,
-      headers: { "Retry-After": "86400" },
-    });
+    const response = NextResponse.rewrite(maintenanceUrl);
+    response.headers.set("Retry-After", "86400");
+    return response;
   }
 
   if (pathname === "/mantenimiento") {
@@ -83,6 +88,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
     "/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

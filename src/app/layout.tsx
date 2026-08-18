@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import { SITE } from "@/lib/constants";
 import { defaultLocale, isLocale, LOCALE_COOKIE } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { LanguageProvider } from "@/lib/i18n/language-provider";
 import { getSiteSettings } from "@/lib/data/queries";
+import { isSiteEnabled } from "@/lib/site-enabled";
 import { socialHref } from "@/lib/site";
+import { MaintenanceScreen } from "@/components/layout/maintenance-screen";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -25,10 +29,20 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
+  await connection();
   const cookieStore = await cookies();
   const rawLocale = cookieStore.get(LOCALE_COOKIE)?.value;
   const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
   const t = getDictionary(locale);
+
+  if (!isSiteEnabled()) {
+    return {
+      metadataBase: new URL(SITE.url),
+      title: t.maintenance.title,
+      description: t.maintenance.body,
+      robots: { index: false, follow: false },
+    };
+  }
 
   return {
     metadataBase: new URL(SITE.url),
@@ -77,10 +91,28 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
+  await connection();
   const cookieStore = await cookies();
   const rawLocale = cookieStore.get(LOCALE_COOKIE)?.value;
   const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
   const t = getDictionary(locale);
+  const siteOn = isSiteEnabled();
+
+  if (!siteOn) {
+    return (
+      <html
+        lang={locale}
+        className={`${cormorant.variable} ${jakarta.variable} h-full antialiased`}
+      >
+        <body className="flex min-h-full flex-col bg-cream font-sans text-ink">
+          <LanguageProvider initialLocale={locale}>
+            <MaintenanceScreen />
+          </LanguageProvider>
+        </body>
+      </html>
+    );
+  }
+
   const settings = await getSiteSettings();
   const sameAs = [
     socialHref("instagram", settings.instagram),
